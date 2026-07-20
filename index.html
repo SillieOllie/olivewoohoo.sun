@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Olive — Portfolio</title>
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background: #fafaf8;
+      color: #1a1a1a;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ========== Colors ========== */
+    :root {
+      --olive: #6b7c3a;
+      --olive-light: #8a9a5b;
+      --olive-pale: #eef0e4;
+      --olive-warm: #c5b35a;
+      --bg: #fafaf8;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --border: #e5e5e0;
+    }
+
+    /* ========== Navigation ========== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 2rem;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-logo { font-weight: 700; font-size: 1.15rem; color: var(--olive); letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: 0.9rem; color: var(--text-muted); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--olive); }
+
+    /* ========== Sections ========== */
+    section { padding: 5rem 2rem; max-width: 900px; margin: 0 auto; }
+
+    /* ========== Hero ========== */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+      padding-top: 4rem;
+    }
+    .hero-greeting { font-size: 1rem; color: var(--olive-light); margin-bottom: 0.75rem; font-weight: 500; }
+    .hero h1 { font-size: clamp(3rem, 7vw, 5rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--olive), var(--olive-warm) 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-tagline { font-size: 1.25rem; color: var(--text-muted); margin-top: 1.25rem; max-width: 500px; }
+    .hero-cta { display: flex; gap: 1rem; margin-top: 2rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; border-radius: 100px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      transition: all 0.25s; border: none;
+    }
+    .btn-primary { background: var(--olive); color: #fff; }
+    .btn-primary:hover { background: #5a6b2f; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(107,124,58,0.3); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--olive); color: var(--olive); }
+
+    /* ========== Section Headers ========== */
+    .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--olive-light); font-weight: 600; margin-bottom: 0.5rem; }
+    .section-title { font-size: clamp(1.75rem, 3.5vw, 2.25rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; }
+
+    /* ========== About ========== */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+    .about-text { font-size: 1.05rem; color: var(--text-muted); }
+    .about-text p + p { margin-top: 1rem; }
+    .about-meta { display: flex; flex-direction: column; gap: 1rem; }
+    .meta-item { padding: 1.25rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); }
+    .meta-item .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .meta-item .value { font-weight: 600; }
+
+    /* ========== Work ========== */
+    .work-list { display: flex; flex-direction: column; gap: 0; }
+    .work-item { display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem; padding: 1.75rem 0; border-bottom: 1px solid var(--border); align-items: start; }
+    .work-item:first-child { border-top: 1px solid var(--border); }
+    .work-date { font-size: 0.85rem; color: var(--text-muted); padding-top: 0.2rem; }
+    .work-role { font-weight: 700; font-size: 1.1rem; }
+    .work-company { color: var(--olive); font-weight: 600; font-size: 0.95rem; }
+    .work-desc { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.35rem; }
+    .work-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+    .tag { font-size: 0.75rem; padding: 0.2rem 0.65rem; border-radius: 100px; background: var(--olive-pale); color: var(--olive); font-weight: 500; }
+
+    /* ========== Skills ========== */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .skill-card { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); }
+    .skill-card .icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .skill-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .skill-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* ========== Contact ========== */
+    .contact-section { text-align: center; }
+    .contact-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .contact-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #fff; border-radius: 100px; border: 1px solid var(--border); font-weight: 500; transition: all 0.2s; }
+    .contact-link:hover { border-color: var(--olive); color: var(--olive); transform: translateY(-1px); }
+
+    /* ========== Footer ========== */
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 720px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1.25rem; }
+      section { padding: 3rem 1.25rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero { min-height: auto; padding-top: 6rem; padding-bottom: 3rem; }
+      .hero h1 { font-size: clamp(2.25rem, 10vw, 3.5rem); }
+      .work-item { grid-template-columns: 1fr; gap: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">Olive</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-greeting">👋 Hi, I'm</p>
+    <h1><span class="highlight">Olive</span></h1>
+    <h1>Sun Jinghua</h1>
+    <p class="hero-tagline">
+      BD Manager at Wolfbox. I bridge brands and markets — turning data into growth across Amazon, affiliate networks, and creator partnerships.
+    </p>
+    <div class="hero-cta">
+      <a href="#work" class="btn btn-primary">View My Work</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <p class="section-label">About</p>
+    <h2 class="section-title">More than a title</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          I'm a business development professional with a passion for bridging data-driven strategy and creative marketing. Currently at <strong>Wolfbox</strong>, I drive growth across Amazon marketplaces and manage a network of affiliate &amp; influencer partnerships.
+        </p>
+        <p>
+          My work spans keyword strategy, competitive analysis, affiliate performance optimization, and KOL collaborations on YouTube, TikTok, and Instagram. I believe great BD is equal parts numbers and narrative.
+        </p>
+        <p>
+          Outside of work, I go by <strong>@sillieollie</strong> online — a name that reflects the balance I strive for: playful creativity grounded in sharp thinking.
+        </p>
+      </div>
+      <div class="about-meta">
+        <div class="meta-item">
+          <div class="label">📍 Location</div>
+          <div class="value">Shenzhen, China</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">💼 Current Role</div>
+          <div class="value">BD Manager @ Wolfbox</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">🌐 Online Alias</div>
+          <div class="value">@sillieollie</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">🗣 Languages</div>
+          <div class="value">中文 · English · 日本語</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section id="work">
+    <p class="section-label">Experience</p>
+    <h2 class="section-title">Where I've made an impact</h2>
+    <div class="work-list">
+      <div class="work-item">
+        <div class="work-date">2023 — Present</div>
+        <div>
+          <div class="work-role">BD Manager</div>
+          <div class="work-company">Wolfbox</div>
+          <div class="work-desc">Leading Amazon marketplace expansion, affiliate marketing via Levanta &amp; PartnerBoost, and global KOL partnerships across YouTube, TikTok, and Instagram.</div>
+          <div class="work-tags">
+            <span class="tag">Amazon</span><span class="tag">Affiliate Marketing</span><span class="tag">KOL Outreach</span><span class="tag">Brand Strategy</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-item">
+        <div class="work-date">Earlier</div>
+        <div>
+          <div class="work-role">E-Commerce Operations</div>
+          <div class="work-company">Previous Roles</div>
+          <div class="work-desc">Built foundational expertise in marketplace operations, keyword analysis, competitive research, and cross-border e-commerce strategy.</div>
+          <div class="work-tags">
+            <span class="tag">Market Research</span><span class="tag">Operations</span><span class="tag">Cross-Border E-Com</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills">
+    <p class="section-label">Skills &amp; Tools</p>
+    <h2 class="section-title">What I work with</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="icon">📊</div>
+        <h3>Amazon Operations</h3>
+        <p>Keyword strategy, listing optimization, competitive analysis, market intelligence</p>
+      </div>
+      <div class="skill-card">
+        <div class="icon">🤝</div>
+        <h3>Affiliate Marketing</h3>
+        <p>Levanta, PartnerBoost — campaign setup, performance tracking, partner recruitment</p>
+      </div>
+      <div class="skill-card">
+        <div class="icon">🎬</div>
+        <h3>Influencer Partnerships</h3>
+        <p>YouTube, TikTok, Instagram KOL sourcing, outreach, and relationship management</p>
+      </div>
+      <div class="skill-card">
+        <div class="icon">📈</div>
+        <h3>Brand Monitoring</h3>
+        <p>Brand24 sentiment tracking, social listening, competitive benchmarking</p>
+      </div>
+      <div class="skill-card">
+        <div class="icon">🔍</div>
+        <h3>Market Research</h3>
+        <p>Product selection, trend analysis, consumer insight extraction through data</p>
+      </div>
+      <div class="skill-card">
+        <div class="icon">🌏</div>
+        <h3>Cross-Cultural BD</h3>
+        <p>Native-level Chinese, business English, working knowledge of Japanese</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="contact-section">
+    <p class="section-label">Contact</p>
+    <h2 class="section-title">Let's talk</h2>
+    <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">
+      Whether it's a collaboration, an opportunity, or just to say hi — I'm always open to connect.
+    </p>
+    <div class="contact-links">
+      <a href="mailto:oliveiraliang@gmail.com" class="contact-link">✉️ Email</a>
+      <a href="#" class="contact-link">💼 LinkedIn</a>
+      <a href="#" class="contact-link">𝕏 Twitter / X</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Olive Sun · Built with ☕ and good taste · <a href="#" style="color: var(--olive);">sillieollie.com</a> (coming soon)</p>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+</body>
+</html>
