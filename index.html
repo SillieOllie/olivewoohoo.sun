@@ -11,10 +11,108 @@
     <meta property="og:description" content="孙婧华 Olive Sun — 海外联盟营销 · AI 工作流，个人作品集：专题调研、展览、生活与模拟计划书。">
     <script type="module" crossorigin src="/assets/index-CCCuYrpR.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-6j9O2DsJ.css">
+    <style>
+      #pixel-cursor-trail {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 2147483647;
+      }
+    </style>
   </head>
   <body>
     
     <div id="root"></div>
-    
+
+    <script>
+      (() => {
+        const COLOR = '#1a5c38'; // 品牌绿，可随意替换
+        const PIXEL = 3;         // 像素方块边长 (px)
+        const RADIUS = 6;        // 笔刷半径 (px)
+        const LIFETIME = 300;    // 拖尾在此时间内完全消失 (ms)
+        const SPACING = 3;       // 采样最小间距 (px)
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'pixel-cursor-trail';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+
+        let dpr = 1;
+        function resize() {
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.floor(innerWidth * dpr);
+          canvas.height = Math.floor(innerHeight * dpr);
+          canvas.style.width = innerWidth + 'px';
+          canvas.style.height = innerHeight + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        addEventListener('resize', resize);
+
+        // Bayer 4x4 有序抖动矩阵（阈值 0..15 / 16）
+        const B = [
+          [ 0,  8,  2, 10],
+          [12,  4, 14,  6],
+          [ 3, 11,  1,  9],
+          [15,  7, 13,  5],
+        ];
+
+        const points = []; // {x, y, t}
+        let last = null;
+        let raf = 0;
+
+        function addPoint(x, y) {
+          const now = performance.now();
+          if (last) {
+            const dx = x - last.x, dy = y - last.y;
+            if (dx * dx + dy * dy < SPACING * SPACING) return;
+          }
+          last = { x, y };
+          points.push({ x, y, t: now });
+        }
+
+        function drawPoint(x, y, life) {
+          const opacity = 1 - life;               // 0..1，随 life 衰减到 0
+          const r = RADIUS * (1 - 0.35 * life);   // 渐隐时略微收缩
+          const gx0 = Math.floor((x - r) / PIXEL), gx1 = Math.floor((x + r) / PIXEL);
+          const gy0 = Math.floor((y - r) / PIXEL), gy1 = Math.floor((y + r) / PIXEL);
+
+          ctx.fillStyle = COLOR;
+          for (let gx = gx0; gx <= gx1; gx++) {
+            for (let gy = gy0; gy <= gy1; gy++) {
+              const cx = gx * PIXEL + PIXEL / 2;
+              const cy = gy * PIXEL + PIXEL / 2;
+              const d = Math.hypot(cx - x, cy - y);
+              if (d > r) continue;
+              const density = (1 - d / r) * opacity; // 中心密、边缘疏，× 渐隐
+              const t = B[((gy % 4) + 4) % 4][((gx % 4) + 4) % 4] / 16;
+              if (t < density) ctx.fillRect(gx * PIXEL, gy * PIXEL, PIXEL, PIXEL);
+            }
+          }
+        }
+
+        function tick() {
+          raf = 0;
+          const now = performance.now();
+          ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+          let i = 0;
+          while (i < points.length && now - points[i].t > LIFETIME) i++;
+          if (i) points.splice(0, i);
+
+          for (const p of points) drawPoint(p.x, p.y, (now - p.t) / LIFETIME);
+
+          if (points.length) raf = requestAnimationFrame(tick);
+        }
+
+        addEventListener('mousemove', (e) => {
+          addPoint(e.clientX, e.clientY);
+          if (!raf) raf = requestAnimationFrame(tick);
+        }, { passive: true });
+      })();
+    </script>
   </body>
 </html>
