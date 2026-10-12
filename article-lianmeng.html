@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浅谈联盟营销 · 孙婧华 Olive Sun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a5c38;
+    --ink: #111;
+    --muted: #6e746d;
+    --paper: #fff;
+    --rule: #e2e2e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--muted);
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .layout {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 24px 88px;
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+  .side {
+    position: sticky;
+    top: 48px;
+  }
+  .back {
+    display: inline-block;
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+    color: var(--green);
+    text-decoration: none;
+    letter-spacing: .02em;
+    margin-bottom: 32px;
+  }
+  .back:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .toc {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--rule);
+    padding-left: 18px;
+  }
+  .toc a {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 0;
+    letter-spacing: .01em;
+  }
+  .toc a:hover { color: var(--green); }
+  .toc a.lvl1 { font-weight: 700; color: var(--ink); margin-top: 8px; }
+  .toc a.lvl2 { padding-left: 14px; }
+  .container {
+    max-width: 680px;
+    margin: 0;
+    padding: 0;
+  }
+  h2, h3 { scroll-margin-top: 24px; }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .side { position: static; }
+    .toc { display: none; }
+    .back { margin-bottom: 24px; }
+  }
+  .kicker {
+    display: block;
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .18em;
+    color: var(--green);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    color: var(--ink);
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 14px 0 10px;
+  }
+  h2 {
+    color: var(--green);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 56px 0 16px;
+  }
+  h2 .num {
+    font-family: "DM Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--green);
+    margin-right: 10px;
+  }
+  h3 .num {
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
+    margin-right: 8px;
+  }
+  h3 {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 32px 0 10px;
+  }
+  p { margin: 0 0 16px; }
+  ul { margin: 0 0 16px; padding-left: 1.4em; }
+  li { margin-bottom: 6px; }
+  li ul { margin-top: 6px; }
+  strong { font-weight: 700; color: var(--ink); }
+  em { font-style: normal; color: var(--green); }
+  .foot {
+    margin-top: 72px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .04em;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="side">
+    <a class="back" href="index.html">← 返回主页</a>
+    <div class="toc">
+      <a href="#sec1" class="lvl1">1 从零开始</a>
+      <a href="#sec2" class="lvl1">2 我的困惑</a>
+      <a href="#sec3" class="lvl1">3 学习和成长</a>
+      <a href="#sec3-1" class="lvl2">Hero 冲 BSR #1</a>
+      <a href="#sec3-2" class="lvl2">亚马逊黑五</a>
+      <a href="#sec3-3" class="lvl2">TikTok 清仓</a>
+      <a href="#sec3-4" class="lvl2">电视节目上线</a>
+      <a href="#sec3-5" class="lvl2">数据整合</a>
+      <a href="#sec3-6" class="lvl2">零散成果</a>
+    </div>
+  </nav>
+
+  <main class="container">
+  <header>
+    <span class="kicker">职·记 · 岗位随笔</span>
+    <h1>浅谈联盟营销</h1>
+  </header>
+
+  <article>
+
+    <section>
+      <h2 id="sec1"><span class="num">1</span>从零开始</h2>
+
+      <p>2025 年 1 月，我零经验进了一家跨境公司，岗位是「亚马逊联盟营销」，挂在亚马逊广告部下面，直接汇报给亚马逊广告负责人。入职前我对这行几乎一无所知。</p>
+
+      <p>第一个阶段「学习基础知识」。</p>
+
+      <p>亚马逊联盟的归因系统（Associates、Attribution、Code），联盟客类型（Deal、Media Buyer、Influencer、Loyalty、PR、CSS）……资料主要来自领导推荐的公众号和亚马逊官方文档。<strong>领导自己也没碰过站外营销，所以那阵子是我们一起学。</strong></p>
+
+      <p><strong>后期除了看资料，在领导的引导下我开始外部交流经验。</strong>加了一些岗位操盘手的微信群，参加线下小圈交流，从 Substack 的专栏摸到几个海外 PR 的 Slack 群，行业峰会上也加了不少头部公司联盟营销岗的微信，时不时请教问题。</p>
+
+      <p>进入到实操，在我来之前，公司已经早先一个月接入了原生联盟 Amazon Creator Connections、第三方平台 PartnerBoost，还有私下合作的一批 Media Buyers，但没有专人管理。我负责全部亚马逊联盟的渠道维护和拓展、定期数据复盘，后面负责带新人、搭知识库。</p>
+
+      <p>一年半下来，从业务结果上看，联盟销售额增长到 1.5-2 倍，ROI 从 7 提升到 9，跟头部 Deal 平台、PR 编辑、二级联盟有了深入的沟通合作。</p>
+    </section>
+
+    <section>
+      <h2 id="sec2"><span class="num">2</span>我的困惑</h2>
+
+      <p>这个岗位，看市面上的 JD，<strong>本质上是「海外 BD 的降维版」——给亚马逊找分销渠道</strong>。</p>
+
+      <ul>
+        <li>维护和拓展联盟渠道</li>
+        <li>调研竞对的推广动作</li>
+        <li>做数据分析</li>
+      </ul>
+
+      <p>但真正做起来，实际工作中，我收到的核心目标只有一个：找到短期能帮亚马逊冲量的渠道。<strong>ROI 哪怕稳定上升，只要没有爆发性的渠道出现，就很难有让人眼前一亮的表现。</strong></p>
+
+      <p><strong>更难的，是公司架构下，内部会有渠道的重复和战略移交：</strong></p>
+
+      <ul>
+        <li>红人，我们小组一开始也做、也出了成果，后来与品牌部商议后由品牌负责，避免职责重复；</li>
+        <li>PR，同样也做出了成果，品牌部有了专人后便移交；</li>
+        <li>博客在战略上服务独立站，与亚马逊无关；</li>
+        <li>DSP 有专职投手；</li>
+        <li>一些 CUG 平台需要与独立站合作，谈成了也要转走；</li>
+        <li>小 B 端能谈成意向，但对亚马逊没有直接贡献。</li>
+      </ul>
+
+      <p>一圈看下来，我只对亚马逊负责，能管理的站外渠道范围也受限。独立站联盟的自由度更大一些，但也逃不开内部抢资源的问题。</p>
+
+      <p>通过和一些头部公司职员的交流，发现他们的处境也是如此。</p>
+    </section>
+
+    <section>
+      <h2 id="sec3"><span class="num">3</span>学习和成长</h2>
+
+      <p>虽然对岗位上限感到悲观，但<strong>我非常感谢这个岗位，感谢在公司野蛮生长的经历。</strong></p>
+
+      <p><strong>这样一个「杂役」岗位，让我跟公司许多部门都打了交道，接触到了多种多样的营销渠道，视野变宽了，也真正体会到「营销最终要回到商业」这句话的重要性。</strong></p>
+
+      <p>以下是项目经历的简单回顾。</p>
+
+      <h3 id="sec3-1"><span class="num">3.1</span>Hero 单品站内外结合冲 BSR #1</h3>
+      <p>Hero 单品此前已通过 YouTube 大型红人横评获得不错声量，但在亚马逊排行榜上仍在 3–5 名浮动，团队目标是通过短期冲刺拿下 BSR #1。</p>
+      <p>打法分两阶段：第一阶段站外用红人影响力 + 头部 Deal 平台冲销量；站外 Deal 结束后，第二阶段用站内促销承接长尾站外流量、放大站内转化。最终成功登顶并稳定保持。</p>
+      <p>我负责与红人和 Deal 平台沟通、确保内容按时上线。这个项目让我感受最深的是<strong>营销动作与承接渠道配合的重要性——站内外时间线没梳理好，站外流量分散进场，效果和效率就会大打折扣，造成资源浪费。</strong></p>
+      <p>其他产品冲排名的案例中，我们还与一位美国本地消费专栏编辑合作：他的专栏虽不在国家级报纸，但会在多个州市报纸分发，同时拥有自己的网站和 Newsletter（约 30 万用户）。通过给他的私域用户提供专属折扣、由他撰写软文推荐，我们成功帮助产品在亚马逊站内实现了排名跃升。</p>
+
+      <h3 id="sec3-2"><span class="num">3.2</span>亚马逊黑五</h3>
+      <p>黑五本身的节日放大效应约有 8–10 倍，我的任务是寻找站外优质曝光位、放大黑五流量入口。</p>
+      <p>深度沟通 Deal 站品类主管（线上视频会议），目标是上线「合集帖子」，让消费者在一个帖子里看到系列多款产品（通常一个帖子只能放一款），增加点击与转化。虽经 2–3 轮沟通，最终因折扣力度限制未能上线。但这段经历让我切身学到：很多规则虽写在网站的 media kit 里，仍存在不少弹性空间，可以为品牌争取最大利益。这需要商业敏锐度、想象力和谈判技巧。</p>
+      <p>提前和效果已验证的红人锁定黑五档期，发布专栏视频。</p>
+      <p>垂类 PR 媒体 Deal 位置采买。</p>
+
+      <h3 id="sec3-3"><span class="num">3.3</span>TikTok 配合季节性产品清仓</h3>
+      <p>今年夏天公司上线一款季节性产品，同时布局亚马逊和 TK 两个渠道。TK 团队无人力承接，我们小组接下了任务，实验打法是「TK 红人内容流量外溢到亚马逊」。这款产品属边缘产品、预算有限，我们先用竞品热门视频写出三个潜力脚本，让 5–6 位红人上线测试，再锁定效果最好的脚本让红人复制传播。</p>
+      <p>过程中因 TK 内部产品页设置出现严重失误，产品评分变差、前期热度增长受阻。但通过对比红人内容传播热度折线图与亚马逊销量折线图，可以确认 TK 流量有效外溢到了亚马逊。最终在季节结束前，两个渠道成功完成全部清库存任务。</p>
+
+      <h3 id="sec3-4"><span class="num">3.4</span>电视节目上线</h3>
+      <p>通过联系州电视台 Deal 栏目主持人，在亚马逊秋促节点让品牌系列产品在地方早间新闻低成本露出。目前正在对接 ABC、NBC 等国家电视台的 Deal 栏目，产品与价格审核已通过，正在沟通物流等后勤事项。</p>
+
+      <h3 id="sec3-5"><span class="num">3.5</span>亚马逊联盟数据整合</h3>
+      <p>亚马逊联盟的数据来自多个来源：亚马逊原生联盟平台、亚马逊引流洞察、第三方联盟平台 ×2、私下合作的联盟客 ×4……。这些平台数据字段不统一，公司也没有统一的 ASIN–简洁主机/配件名对应表。我借助 AI 和 Python 做了一套模块化、可交互运行的数据处理系统，并定期同步到可视化看板。</p>
+
+      <h3 id="sec3-6"><span class="num">3.6</span>零散的小成果</h3>
+      <ul>
+        <li>pitch 了两个品类垂类 Top 网站的 Reviews 编辑，让产品成功入选 Best Products 文章；</li>
+        <li>在公司内部分享 AI 加爬虫的应用；</li>
+        <li>做了几个油猴脚本：
+          <ul>
+            <li>抓 Google 付费位、防止 brand bidding 的联盟客大量投放品牌词</li>
+            <li>一键抓 YouTube 评论区</li>
+            <li>一键抓 Reddit 搜索页 URL、存 JSON</li>
+          </ul>
+        </li>
+        <li>年底给合作密切的联盟客寄了小礼物。</li>
+      </ul>
+    </section>
+
+  </article>
+
+  <footer class="foot">
+    孙婧华 · Olive Sun — 海外联盟营销 · AI 工作流
+  </footer>
+
+  </main>
+
+</div>
+</body>
+</html>

@@ -12,37 +12,78 @@
     <script type="module" crossorigin src="/assets/index-CCCuYrpR.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-6j9O2DsJ.css">
     <style>
-      #pixel-cursor-trail {
-        position: fixed;
-        top: 0;
-        left: 0;
-        pointer-events: none;
-        z-index: 2147483647;
-      }
+      *, *::before, *::after { cursor: none !important; }
     </style>
   </head>
   <body>
-    
+
     <div id="root"></div>
 
     <script>
       (() => {
-        const COLOR = '#1a5c38'; // 品牌绿，可随意替换
-        const PIXEL = 3;         // 像素方块边长 (px)
-        const RADIUS = 6;        // 笔刷半径 (px)
-        const LIFETIME = 300;    // 拖尾在此时间内完全消失 (ms)
-        const SPACING = 3;       // 采样最小间距 (px)
+        // 用户自定义形状（绿描边 + 白内里）
+        const SHAPE = [
+          "11..............................",
+          "111.............................",
+          "1111............................",
+          "11111...........................",
+          "111111..........................",
+          "1111111.........................",
+          "11111111........................",
+          "111111111.......................",
+          "1111111111......................",
+          "11111111111.....................",
+          "111111111111....................",
+          "1111111111111...................",
+          "11111111111111..................",
+          "111111111111111.................",
+          "1111111111111111................",
+          "11111111111111111...............",
+          "111111111111111111..............",
+          "1111111111111111111.............",
+          "11111111111111111111............",
+          "11111111111111111111............",
+          "111111111111....................",
+          "111111111111....................",
+          "111111111111....................",
+          "111111.111111...................",
+          "11111..111111...................",
+          "1111....111111..................",
+          "111.....111111..................",
+          "11.......111111.................",
+          ".........111111.................",
+          "..........111111................",
+          "..........111111................",
+          "...........1111.................",
+        ];
+        const GREEN = '#1a5c38';
+        const WHITE = '#ffffff';
+        const SCALE = 2; // 每个像素块的逻辑尺寸(px)，调大/调小改这里
 
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const H = SHAPE.length, W = SHAPE[0].length;
+        const solid = new Set();
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (SHAPE[y][x] === '1') solid.add(x + ',' + y);
+        const cell = [];
+        for (let y = 0; y < H; y++) {
+          cell[y] = [];
+          for (let x = 0; x < W; x++) {
+            if (!solid.has(x + ',' + y)) continue;
+            const edge = !solid.has((x + 1) + ',' + y) || !solid.has((x - 1) + ',' + y)
+                     || !solid.has(x + ',' + (y + 1)) || !solid.has(x + ',' + (y - 1));
+            cell[y][x] = edge ? GREEN : WHITE;
+          }
+        }
 
         const canvas = document.createElement('canvas');
-        canvas.id = 'pixel-cursor-trail';
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0'; canvas.style.left = '0';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '2147483647';
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
 
-        let dpr = 1;
         function resize() {
-          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
           canvas.width = Math.floor(innerWidth * dpr);
           canvas.height = Math.floor(innerHeight * dpr);
           canvas.style.width = innerWidth + 'px';
@@ -52,66 +93,25 @@
         resize();
         addEventListener('resize', resize);
 
-        // Bayer 4x4 有序抖动矩阵（阈值 0..15 / 16）
-        const B = [
-          [ 0,  8,  2, 10],
-          [12,  4, 14,  6],
-          [ 3, 11,  1,  9],
-          [15,  7, 13,  5],
-        ];
-
-        const points = []; // {x, y, t}
-        let last = null;
-        let raf = 0;
-
-        function addPoint(x, y) {
-          const now = performance.now();
-          if (last) {
-            const dx = x - last.x, dy = y - last.y;
-            if (dx * dx + dy * dy < SPACING * SPACING) return;
-          }
-          last = { x, y };
-          points.push({ x, y, t: now });
-        }
-
-        function drawPoint(x, y, life) {
-          const opacity = 1 - life;               // 0..1，随 life 衰减到 0
-          const r = RADIUS * (1 - 0.35 * life);   // 渐隐时略微收缩
-          const gx0 = Math.floor((x - r) / PIXEL), gx1 = Math.floor((x + r) / PIXEL);
-          const gy0 = Math.floor((y - r) / PIXEL), gy1 = Math.floor((y + r) / PIXEL);
-
-          ctx.fillStyle = COLOR;
-          for (let gx = gx0; gx <= gx1; gx++) {
-            for (let gy = gy0; gy <= gy1; gy++) {
-              const cx = gx * PIXEL + PIXEL / 2;
-              const cy = gy * PIXEL + PIXEL / 2;
-              const d = Math.hypot(cx - x, cy - y);
-              if (d > r) continue;
-              const density = (1 - d / r) * opacity; // 中心密、边缘疏，× 渐隐
-              const t = B[((gy % 4) + 4) % 4][((gx % 4) + 4) % 4] / 16;
-              if (t < density) ctx.fillRect(gx * PIXEL, gy * PIXEL, PIXEL, PIXEL);
-            }
-          }
-        }
-
-        function tick() {
+        let mx = -100, my = -100, raf = 0;
+        function draw() {
           raf = 0;
-          const now = performance.now();
           ctx.clearRect(0, 0, innerWidth, innerHeight);
-
-          let i = 0;
-          while (i < points.length && now - points[i].t > LIFETIME) i++;
-          if (i) points.splice(0, i);
-
-          for (const p of points) drawPoint(p.x, p.y, (now - p.t) / LIFETIME);
-
-          if (points.length) raf = requestAnimationFrame(tick);
+          for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+            const c = cell[y][x];
+            if (!c) continue;
+            ctx.fillStyle = c;
+            ctx.fillRect(mx + x * SCALE, my + y * SCALE, SCALE, SCALE);
+          }
         }
-
         addEventListener('mousemove', (e) => {
-          addPoint(e.clientX, e.clientY);
-          if (!raf) raf = requestAnimationFrame(tick);
+          mx = e.clientX; my = e.clientY;
+          if (!raf) raf = requestAnimationFrame(draw);
         }, { passive: true });
+        document.addEventListener('mouseleave', () => {
+          mx = -100; my = -100;
+          if (!raf) raf = requestAnimationFrame(draw);
+        });
       })();
     </script>
   </body>

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TICKEY × BBF 线上线下整合营销案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#0B0B0B;
+    --red:#E30613;
+    --muted:#6E6E6E;
+    --line:#0B0B0B;
+    --hair:#D9D7D2;
+    --mono:"IBM Plex Mono","SF Mono",ui-monospace,monospace;
+    --sans:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    padding-left:240px;
+  }
+
+  .sidebar{
+    position:fixed;top:0;left:0;width:240px;height:100vh;
+    background:var(--bg);border-right:1px solid var(--ink);
+    padding:22px 20px 16px;display:flex;flex-direction:column;z-index:200;
+  }
+  .sidebar nav{flex:1 1 auto;overflow-y:auto;min-height:0;}
+  .sidebar .brand{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;}
+  .sidebar .brand .x{color:var(--red);}
+  .sidebar .brand .sub{display:block;margin-top:8px;font-size:9.5px;letter-spacing:.14em;color:var(--muted);}
+  .sidebar .home{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:16px;}
+  .sidebar .home:hover{color:var(--red);}
+  .sidebar .nav-head{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:30px 0 6px;}
+  .sidebar .audio-hint{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--red);margin:0 0 12px;line-height:1.4;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .sidebar .audio-hint .hand{font-size:24px;animation:hintpulse 1.8s ease-in-out infinite;}
+  @keyframes hintpulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .sidebar .caption{border-top:1px solid var(--ink);padding:12px 0 0;display:none;}
+  .sidebar .caption.on{display:block;}
+  .sidebar .caption .cap-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
+  .sidebar .caption .cap-id{font-family:var(--mono);font-size:10px;color:var(--red);font-weight:600;}
+  .sidebar .caption .cap-title{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;font-weight:600;}
+  .sidebar .caption .cap-text{font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--ink);font-weight:600;}
+  .sidebar nav a{
+    display:flex;align-items:baseline;gap:12px;
+    text-decoration:none;color:var(--ink);
+    padding:9px 0;border-bottom:1px solid var(--hair);
+    font-size:13px;line-height:1.3;
+  }
+  .sidebar nav a .n{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:600;min-width:24px;}
+  .sidebar nav a .t{font-weight:600;letter-spacing:-.01em;}
+  .sidebar nav a:hover .t{color:var(--red);}
+  .sidebar nav a.active{position:relative;}
+  .sidebar nav a.active .n{color:var(--red);}
+  .sidebar nav a.active .t{color:var(--red);}
+  .sidebar nav a.active::before{content:"";position:absolute;left:-20px;top:0;bottom:0;width:3px;background:var(--red);}
+  .sidebar nav a .aud{margin-left:auto;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;padding:6px 0 6px 8px;user-select:none;}
+  .sidebar nav a .aud:hover .play{color:var(--red);}
+  .sidebar nav a .play{font-family:var(--mono);font-size:10px;color:var(--muted);user-select:none;line-height:1;pointer-events:none;}
+  .sidebar nav a .play.playing{color:var(--red);}
+  .sidebar nav a .dur{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.02em;white-space:nowrap;pointer-events:none;}
+  @media(max-width:900px){
+    body{padding-left:0;}
+    .sidebar{display:none;}
+  }
+
+  .frame{max-width:1400px;margin:0 auto;padding:0 36px;}
+  .hair{height:1px;background:var(--ink);border:0;}
+
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 0;border-bottom:1px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .topbar .dot{color:var(--red);}
+
+  .hero{padding:72px 0 40px;}
+  .hero-title{
+    font-size:clamp(60px,12vw,190px);
+    font-weight:900;line-height:.88;letter-spacing:-.04em;
+  }
+  .hero-title .x{color:var(--red);font-weight:800;}
+  .hero-top{display:grid;grid-template-columns:1.15fr 1fr;gap:48px;align-items:start;}
+  .hero-note{border-top:1px solid var(--ink);padding-top:16px;font-size:14.5px;color:#3a3a3a;line-height:1.75;}
+  .hero-note p{margin-bottom:14px;}
+  .hero-note p:last-child{margin-bottom:0;}
+  .hero-note a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--red);}
+  .hero-note a:hover{color:var(--red);}
+  .hero-note u{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;}
+  u.red{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;text-decoration-color:var(--red);}
+  .link-red{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;text-decoration-color:var(--red);}
+  .link-red:hover{color:var(--red);}
+  @media(max-width:900px){.hero-top{grid-template-columns:1fr;}}
+  .hero-sub{
+    display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:end;
+    margin-top:56px;padding-top:28px;border-top:1px solid var(--ink);
+  }
+  .hero-slogan{font-size:clamp(26px,4.4vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1;}
+  .hero-slogan .zh{display:block;margin-top:12px;font-size:clamp(15px,1.6vw,20px);font-weight:500;letter-spacing:.02em;}
+  .hero-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--ink);border:1px solid var(--ink);}
+  .hero-meta .cell{background:var(--bg);padding:14px 16px;}
+  .hero-meta .label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
+  .hero-meta .val{font-size:14px;font-weight:600;letter-spacing:-.01em;}
+
+  section{padding:72px 0;border-top:1px solid var(--ink);}
+  .sec-head{display:grid;grid-template-columns:minmax(120px,220px) 1fr;gap:40px;align-items:start;margin-bottom:44px;}
+  .sec-num{font-size:clamp(56px,9vw,120px);font-weight:900;line-height:.8;letter-spacing:-.05em;font-feature-settings:"tnum";}
+  .sec-num .accent{color:var(--red);}
+  .sec-en{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:14px;}
+  .sec-title{font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.02;}
+  .sec-kicker{margin-top:16px;font-size:16px;color:var(--muted);max-width:640px;line-height:1.6;}
+
+  .lead{font-size:clamp(18px,2.2vw,26px);font-weight:600;letter-spacing:-.02em;line-height:1.45;max-width:960px;}
+  .lead .hl{color:var(--red);}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:28px 24px;}
+  .col-12{grid-column:span 12;}
+  .col-8{grid-column:span 8;}
+  .col-7{grid-column:span 7;}
+  .col-6{grid-column:span 6;}
+  .col-5{grid-column:span 5;}
+  .col-4{grid-column:span 4;}
+  .col-3{grid-column:span 3;}
+  @media(max-width:900px){
+    .col-3,.col-4,.col-5,.col-6,.col-7,.col-8{grid-column:span 12;}
+    .sec-head{grid-template-columns:1fr;gap:20px;}
+    .hero-sub{grid-template-columns:1fr;}
+  }
+
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:12px;}
+  h4{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0 0 14px;}
+  p.body{font-size:15px;color:#232323;max-width:820px;margin-bottom:12px;}
+  ul.list{list-style:none;margin:0 0 20px;}
+  ul.list li{position:relative;padding-left:20px;margin-bottom:8px;font-size:15px;color:#232323;max-width:860px;}
+  ul.list li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--red);}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ink);border:1px solid var(--ink);margin-bottom:32px;}
+  .stat{background:var(--bg);padding:22px 20px;}
+  .stat .num{font-size:clamp(30px,4vw,52px);font-weight:900;letter-spacing:-.04em;line-height:1;font-feature-settings:"tnum";}
+  .stat .num.red{color:var(--red);}
+  .stat .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:12px;display:block;}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr);}}
+
+  .scroll{overflow-x:auto;}
+  .scroll table{min-width:900px;}
+
+  table.swiss{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:28px;}
+  table.swiss thead th{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    text-align:left;color:var(--muted);font-weight:500;
+    border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding:10px 12px;vertical-align:bottom;
+  }
+  table.swiss tbody td{border-bottom:1px solid var(--hair);padding:12px;vertical-align:top;text-align:left;color:var(--muted);}
+  table.swiss tbody tr:last-child td{border-bottom:2px solid var(--ink);}
+  table.swiss td.num,table.swiss th.num{text-align:right;font-feature-settings:"tnum";font-variant-numeric:tabular-nums;}
+  table.swiss td.num{font-family:var(--mono);font-size:13px;white-space:nowrap;}
+  table.swiss .strong{font-weight:700;color:var(--ink);}
+  table.swiss td.eng{font-size:13px;}
+  table.swiss .red{color:var(--red);font-weight:700;}
+
+  .tbl-head{display:flex;justify-content:space-between;align-items:baseline;margin:36px 0 14px;border-bottom:1px solid var(--ink);padding-bottom:8px;}
+  .tbl-head h4{margin:0;}
+  .tbl-head .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+
+  .metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 20px;align-items:start;}
+  .metrics-grid .tbl-head{margin-top:0;}
+  .metrics-grid .metric table.swiss{margin-bottom:0;}
+  .metrics-grid .metric-full{grid-column:1/-1;}
+  @media(max-width:1100px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:760px){.metrics-grid{grid-template-columns:1fr;}}
+  .img-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:20px 0 8px;max-width:50%;}
+  .img-row img{width:100%;height:auto;border:1px solid var(--ink);display:block;background:var(--bg);}
+  @media(max-width:760px){.img-row{grid-template-columns:1fr;}}
+  .img-one{margin:20px 0 8px;}
+  .img-one img{max-width:260px;width:100%;height:auto;border:1px solid var(--ink);display:block;background:var(--bg);}
+  .img-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0 8px;max-width:50%;}
+  .img-row3 img{width:100%;height:auto;border:1px solid var(--ink);display:block;background:var(--bg);}
+  @media(max-width:760px){.img-row3{grid-template-columns:1fr;}}
+
+  .phase{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ink);border:1px solid var(--ink);margin-bottom:32px;}
+  .phase .p{background:var(--bg);padding:22px 20px;}
+  .phase .p .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:10px;}
+  .phase .p h4{margin-bottom:6px;}
+  .phase .p .date{font-family:var(--mono);font-size:12px;color:var(--red);font-weight:500;}
+  .phase .p p{font-size:13.5px;color:#333;margin-top:8px;}
+  @media(max-width:760px){.phase{grid-template-columns:1fr;}}
+
+  .step{display:grid;grid-template-columns:64px 1fr;gap:16px;margin-bottom:22px;}
+  .step .idx{font-family:var(--mono);font-size:12px;color:var(--red);font-weight:600;padding-top:3px;}
+
+  .index{padding:56px 0;}
+  .index-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--ink);}
+  .index a{display:flex;align-items:baseline;gap:18px;text-decoration:none;color:var(--ink);padding:18px 4px;border-bottom:1px solid var(--hair);transition:padding-left .18s ease;}
+  .index a:hover{padding-left:12px;}
+  .index a .n{font-family:var(--mono);font-size:13px;color:var(--red);font-weight:600;min-width:28px;}
+  .index a .t{font-size:17px;font-weight:600;letter-spacing:-.01em;}
+  .index a .e{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-left:auto;white-space:nowrap;}
+  @media(max-width:760px){.index-grid{grid-template-columns:1fr;}}
+
+  footer{padding:48px 0 80px;border-top:1px solid var(--ink);}
+  footer .col{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+
+  .callout{background:var(--red);color:#fff;padding:28px 30px;margin:28px 0;}
+  .callout .label{color:rgba(255,255,255,.75);}
+  .callout p{font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.4;max-width:840px;}
+
+  .blockquote{border-left:3px solid var(--red);padding:8px 0 8px 24px;margin:24px 0;font-size:clamp(20px,2.6vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.3;max-width:880px;}
+  .blockquote .src{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:16px;font-weight:500;}
+
+  .doc-title{font-size:clamp(32px,5vw,60px);font-weight:900;letter-spacing:-.03em;line-height:1.05;margin:48px 0 8px;}
+  .link-mono{font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all;}
+  .link-mono a{color:var(--ink);}
+
+  .reel iframe,.reel video,.reel img{width:100%;height:620px;border:1px solid var(--ink);background:#fff;display:block;object-fit:cover;}
+
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:8px 0 72px;}
+  @media(max-width:900px){.reels{grid-template-columns:1fr;}}
+
+  .gray-sm{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;}
+  .gray-sm p.body{font-size:11px;color:var(--muted);}
+  .gray-sm ul.list li{font-size:11px;color:var(--muted);}
+  .gray-sm table.swiss{font-size:11px;}
+  .gray-sm table.swiss td{color:var(--muted);font-weight:400;}
+  .gray-sm table.swiss thead th{font-size:11px;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="home" href="index.html">← 返回主页</a>
+  <div class="brand">TICKEY <span class="x">×</span> BBF<span class="sub">线上线下整合营销案</span></div>
+  <div class="nav-head">目录 / Contents</div>
+  <div class="audio-hint">点击 ▶ 收听每节语音 <span class="hand">☟</span></div>
+  <nav>
+    <a href="#s0" class="active"><span class="n">00</span><span class="t">TICKEY 是什么产品？</span><span class="aud" data-src="media/零.m4a"><span class="play">▶</span><span class="dur">5:55</span></span></a>
+    <a href="#s1"><span class="n">01</span><span class="t">活动前提 &amp; 目的</span><span class="aud" data-src="media/一.m4a"><span class="play">▶</span><span class="dur">3:36</span></span></a>
+    <a href="#s2"><span class="n">02</span><span class="t">活动营销主题</span><span class="aud" data-src="media/二.m4a"><span class="play">▶</span><span class="dur">0:17</span></span></a>
+    <a href="#s3"><span class="n">03</span><span class="t">活动营销节奏</span><span class="aud" data-src="media/三.m4a"><span class="play">▶</span><span class="dur">0:23</span></span></a>
+    <a href="#s4"><span class="n">04</span><span class="t">活动内容策划</span><span class="aud" data-src="media/四.m4a"><span class="play">▶</span><span class="dur">2:56</span></span></a>
+    <a href="#s5"><span class="n">05</span><span class="t">媒介策划</span><span class="aud" data-src="media/五.m4a"><span class="play">▶</span><span class="dur">1:41</span></span></a>
+    <a href="#s6"><span class="n">06</span><span class="t">广告规划</span><span class="aud" data-src="media/六.m4a"><span class="play">▶</span><span class="dur">0:23</span></span></a>
+    <a href="#s7"><span class="n">07</span><span class="t">预算拆分</span></a>
+    <a href="#s8"><span class="n">08</span><span class="t">效果 &amp; 效率衡量</span><span class="aud" data-src="media/八.m4a"><span class="play">▶</span><span class="dur">0:34</span></span></a>
+    <a href="#s9"><span class="n">09</span><span class="t">风险和预案</span></a>
+  </nav>
+  <div class="caption" id="caption">
+    <div class="cap-head"><span class="cap-id" id="capId">00</span><span class="cap-title" id="capTitle">TICKEY 是什么产品？</span></div>
+    <div class="cap-text" id="capText"></div>
+  </div>
+</aside>
+<div class="frame">
+
+  <div class="topbar">
+    <span>TICKEY <span class="dot">×</span> BBF — 线上线下整合营销案</span>
+    <span>Mockup <span class="dot">/</span> v1.0 <span class="dot">/</span> 模拟提案</span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="hero-title">TICKEY<br><span class="x">×</span> BBF</div>
+      <div class="hero-note">
+        <p>一开始刷到TICKEY是在<a href="https://www.xiaohongshu.com/user/profile/6881e3f2000000001d025b46/6a6d6986000000000502059d" target="_blank" rel="noopener">小红书</a>上被它的外观和墨水屏属性吸引，紧接着又刷到这个产品在kickstarter上众筹的消息。搜索后发现，TICKEY在kickstarter上有大几千的支持者，预购售出约10000+台，筹集资金已近90w美金。这个数字实在亮眼。</p>
+        <p>2026年，迷你墨水屏产品层出不穷，代表性的产品有磁吸阅读器、墨水屏手机壳、墨水屏日程管理器、墨水屏小卡，功用上可以总结为「阅读」、「展示」、「效率管理」。但这些产品帖子中，只有TICKEY击中我。TICKEY的票券外形设计以及金属质感，在审美属性上尤为突出。</p>
+        <p>恰好这个时间，我正为岗位转型做准备，于是，<u>我选择TICKEY做了一份mockup活动营销草案。</u></p>
+      </div>
+    </div>
+    <div class="hero-sub">
+      <div class="hero-slogan">
+        CARRY YOUR MOMENT
+        <span class="zh">TICKEY随身，「时刻」相伴</span>
+      </div>
+      <div class="hero-meta">
+        <div class="cell"><span class="label">Client</span><span class="val">TICKEY</span></div>
+        <div class="cell"><span class="label">Venue</span><span class="val">线上 + 线下</span></div>
+        <div class="cell"><span class="label">Date</span><span class="val">10/2–11/1</span></div>
+        <div class="cell"><span class="label">Budget</span><span class="val">$40,000</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════ 00 产品 ═══════════ -->
+  <section id="s0">
+    <div class="sec-head">
+      <div class="sec-num"><span class="accent">0</span>0</div>
+      <div class="sec-title-box">
+        <span class="sec-en">Product / 产品</span>
+        <h2 class="sec-title">TICKEY 是什么产品？</h2>
+      </div>
+    </div>
+
+    <span class="label">产品简介</span>
+    <p class="body">TICKEY 是一款「全彩墨水屏」卡片，可以用作包挂、数字名片、桌搭、冰箱日历等等。</p>
+    <p class="body"><a class="link-red" href="https://www.kickstarter.com/projects/enilinx/ticket-refresh-it-new-clip-it-on-carry-your-moment/description" target="_blank" rel="noopener">目前已在kickstarter获得8,000+backer，筹款接近90万美元，预购10,000+件。</a></p>
+
+    <span class="label">产品演示 · Reel</span>
+    <div class="reels">
+      <div class="reel">
+        <video src="media/1.mp4" controls autoplay muted loop playsinline preload="auto"></video>
+      </div>
+      <div class="reel">
+        <img src="media/tickey-spider-silk.jpg" alt="TICKEY 蜘蛛丝 Enilinx">
+      </div>
+      <div class="reel">
+        <video src="media/video-iandreamosca.mp4" controls autoplay muted loop playsinline preload="auto"></video>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">8,000<span style="font-size:.5em">+</span></div><span class="cap">Backer</span></div>
+      <div class="stat"><div class="num">10,000<span style="font-size:.5em">+</span></div><span class="cap">预购</span></div>
+      <div class="stat"><div class="num red">$900k</div><span class="cap">筹款</span></div>
+    </div>
+
+    <div class="tbl-head"><h4>Feature</h4><span class="tag">产品特性</span></div>
+    <ul class="list">
+      <li>户外强光清晰可读、质感柔和。（墨水屏依靠反射环境光成像，阳光越充足，反射的亮度越高，越醒目。）</li>
+      <li>磁吸金属外框，多种面板，多种风格。</li>
+      <li>夹、挂、贴、放 —— 自由变换佩戴方式。</li>
+      <li>app内置多种实用模板，随时切换你需要的工具 —— 任务清单、番茄钟、像素动画、日历、天气、新闻、股票行情、读书摘记等。</li>
+      <li>快刷3s上屏，慢刷13s上屏。</li>
+      <li>内置NFC，一碰分享名片、作品集、社交主页。</li>
+      <li>支持固件开源创作，普通用户可一键上手社区新玩法。</li>
+      <li>续航持久，一次充电可刷新1000+次，大约可连续使用2个月。刷新和连接才耗电，静态图片没电也能一直显示</li>
+    </ul>
+
+    <div class="doc-title">TICKEY × BBF 线上线下整合营销案</div>
+  </section>
+
+  <!-- ═══════════ 01 前提&目的 ═══════════ -->
+  <section id="s1">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">1</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Strategy / 前提 &amp; 目的</span>
+        <h2 class="sec-title">一、活动前提&amp;目的</h2>
+      </div>
+    </div>
+
+    <span class="label">战略前提</span>
+    <p class="lead">TICKEY 主攻 JTDB「个性展示」，差异化定位「高级装饰质感 + 一屏百变 + 夹挂贴放」，对标潮玩挂件、替代其部分功能。<span class="hl">STP 切出两类用户，贡献两种价值：</span></p>
+
+    <div class="tbl-head"><h4>Persona</h4><span class="tag">两类用户</span></div>
+    <div class="scroll">
+      <table class="swiss">
+        <thead>
+          <tr><th>人群</th><th>Persona</th><th>角色</th><th>价值贡献</th><th>基本信息</th><th>行为特征</th><th>痛点</th><th>产品场景映射</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="strong">潮流配饰者</td>
+            <td>Aesthetic Ava</td>
+            <td><span class="red">利润中心</span></td>
+            <td>纯付费消费者，靠复购主机/面板直接贡献营收</td>
+            <td>Marketing Intern（广告公司实习生），23 岁，美国一线城市（LA / NYC / Austin / Boston）</td>
+            <td>每周买 1–2 次小件，线上线下并重；信息源靠 Instagram、TikTok、Youtube等社媒平台；买东西经常受社媒驱动</td>
+            <td>表达欲强但更新成本高</td>
+            <td>一屏百变的挂件，随心情换图案，同时变成她的社媒内容素材</td>
+          </tr>
+          <tr>
+            <td class="strong">开源创作者</td>
+            <td>Maker Milo</td>
+            <td><span class="red">生态引擎</span></td>
+            <td><span class="red">产消一体——既是买家又是内容产出者</span>，动机是自我实现+社区认同，无偿分享成果，与品牌社区价值共创</td>
+            <td>软件工程师 / 独立开发者，28 岁，开源社区活跃（GitHub / Hacker News）</td>
+            <td>自己写代码、拼硬件、刷固件，追求可编程、可扩展</td>
+            <td>从零做原创项目开发周期长、投入大，却常常没人响应，成就感低</td>
+            <td>自己写固件上传产品社区，获得其他用户投票点赞，被评为季度最佳功能开发</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <span class="label">现状</span>
+    <p class="body">现状：众筹已获 8,000+ 支持者、超 $90 万预购、1 万+ 件，但<u class="red">这批种子用户中泛科技/极客人群超过7成（根据公开渠道Kickstarter人群特征x公开社媒渠道评论推测），更多「潮流配饰」消费者未进入注意力池子。后续营收正向稳定增长需要「以潮流配饰为目的」的消费者 + 送礼价值。</u></p>
+
+    <span class="label">为什么是 BBF</span>
+    <p class="body" style="font-weight:700;">城市与人群：<span style="color:var(--red);">Boston 是一座符合 Persona 1 画像的一线城市</span></p>
+    <table class="swiss">
+      <thead><tr><th>Boston 城市特征</th><th>对应 Persona 1 画像</th></tr></thead>
+      <tbody>
+        <tr><td>美国东部一线城市</td><td>一线城市</td></tr>
+        <tr><td>60+ 高校，学生/年轻白领密集</td><td>18–35 岁</td></tr>
+        <tr><td>出版、文创、潮流配饰消费成熟</td><td>悦己、自我表达、为情绪价值付费</td></tr>
+        <tr><td>IG / TikTok / Pinterest 重度使用人群集中</td><td>社媒驱动、信息源靠社媒</td></tr>
+      </tbody>
+    </table>
+    <p class="body">Boston 是美国东部一线城市，也是全美高校与学生密度最高的城市之一——哈佛、MIT、波士顿大学、波士顿学院、伯克利音乐学院等 60 余所高校环绕，常年聚集大量 18–35 岁、有创意与文艺消费习惯、社媒活跃的年轻人口。这座城市正好拥有大量 Persona 1「一线城市 + 18–35 岁 + 悦己自我表达 + 社媒驱动」人群。</p>
+
+    <div class="tbl-head"><h4>BBF 实况数据</h4><span class="tag">Boston Book Festival</span></div>
+    <table class="swiss">
+      <thead><tr><th>指标</th><th>数值</th></tr></thead>
+      <tbody>
+        <tr><td>时间</td><td>2026-10-17（周六）10:00–18:00；10-16 周五晚为售票开幕式（Michael Lewis × Geraldine Brooks）</td></tr>
+        <tr><td>地点</td><td>Copley Square，Boston（含 Boston Public Library / Old South Church 等场馆）</td></tr>
+        <tr><td>人次</td><td>约 25,000 人次/年，新英格兰最大文学节</td></tr>
+        <tr><td>作者</td><td>200+ 作者，80+ 场 session</td></tr>
+        <tr><td>户外街市</td><td>60+ 展商（小型出版社、文创、kids zone、咖啡、餐车、WBUR booth），风雨无阻</td></tr>
+        <tr><td>人群</td><td>全年龄，跨新英格兰，年轻写作者/读者占比高</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>核心目标</h4><span class="tag">Goals</span></div>
+    <div class="grid">
+      <div class="col-4">
+        <span class="label">当次活动 · <span style="color:var(--red);">业务目标</span></span>
+        <ul class="list"><li><span style="color:var(--red);">新客增长，把 TICKEY 从种子用户推向潮流配饰消费人群</span></li></ul>
+      </div>
+      <div class="col-4">
+        <span class="label">当次活动 · <span style="color:var(--red);">营销目标</span></span>
+        <ul class="list">
+          <li><span class="strong" style="color:var(--red);">认知：</span>让潜在目标人群群首次了解 TICKEY，并建立"这是表达个性的潮流配饰"的认知</li>
+          <li><span class="strong" style="color:var(--red);">信任：</span>让潜在目标人群通过亲身体验/KOL背书，相信"这是值得入手的潮流配饰"</li>
+          <li><span class="strong" style="color:var(--red);">转化：</span>完成首单转化（线上/线下）</li>
+        </ul>
+      </div>
+      <div class="col-4">
+        <span class="label"><span style="color:var(--red);">战略目标（为未来蓄水）</span></span>
+        <ul class="list">
+          <li>拓宽潜在人群 → 反哺线上搜索转化——<span style="color:var(--red);">线下物理触达线上定向覆盖不到的画像外人群</span>，再回流线上搜索</li>
+          <li><span style="color:var(--red);">为 12 月节日季埋种子——产品礼物属性强</span>，10 月中下旬先建认知、攒数据、蓄心智，为 11–12 月最重要礼物季的销售增长做铺垫</li>
+          <li><span style="color:var(--red);">为未来线下渠道进场背书</span>——BBF 是成熟、有公信力的线下场域，成功落地一场摊位活动，就是一份「线下零售可执行 + 真实转化数据 + 现场 UGC」的案例；且 BBF 的书店/文创调性与 B&amp;N等生活方式复合零售空间高度一致，这份背书可用于未来谈这类商超进场。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 02 主题 ═══════════ -->
+  <section id="s2">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">2</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Theme / 主题</span>
+        <h2 class="sec-title">二、活动营销主题</h2>
+      </div>
+    </div>
+
+    <span class="label">活动标语</span>
+    <div class="callout">
+      <p>CARRY YOUR MOMENT</p>
+      <p style="font-weight:600;">TICKEY随身，「时刻」相伴</p>
+    </div>
+
+    <span class="label">活动概念</span>
+    <div class="blockquote">
+      Lines make a story. Moments make a life.
+      <span class="src">段落连成故事，片刻组成生活。</span>
+    </div>
+
+    <span class="label">活动叙事</span>
+    <div class="grid">
+      <div class="col-6">
+        <p class="body" style="font-size:16px;">Some moments don't end — a laughing face, a sunlit place, a warm embrace. TICKEY keeps them close.</p>
+        <p class="body" style="font-weight:700;">Carry TICKEY. Carry Your Moment.</p>
+      </div>
+      <div class="col-6">
+        <p class="body" style="font-size:16px;">总有些时刻值得挂念 —— 一个温暖的拥抱，两张相视而笑的脸，三人共赏的红粉夕阳。TICKEY帮你留住这些鲜活片刻。</p>
+        <p class="body" style="font-weight:700;">TICKEY随身，「时刻」相伴。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 03 节奏 ═══════════ -->
+  <section id="s3">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">3</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Timeline / 节奏</span>
+        <h2 class="sec-title">三、活动营销节奏</h2>
+      </div>
+    </div>
+
+    <table class="swiss">
+      <thead><tr><th>阶段</th><th>时间</th><th>目标</th><th>核心动作</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">① 预热期</td><td>10/2–10/15（14 天）</td>
+          <td style="color:var(--red);">种草 → 官宣 → 导流，强化「Carry Your Moment」心智</td>
+          <td>场景内容 + KOL 开箱测评 + 官宣 + 倒计时</td>
+        </tr>
+        <tr>
+          <td class="strong">② 爆发期</td><td>10/16–10/18（3 天）</td>
+          <td style="color:var(--red);">现场体验 + 实时 UGC 放大</td>
+          <td>工牌首亮相 + Staff 内容 + 摊位承接 + 实时 UGC + 回顾混剪</td>
+        </tr>
+        <tr>
+          <td class="strong">③ 长尾期</td><td>10/19–11/1（14 天）</td>
+          <td style="color:var(--red);">内容放大 + 承接线索 + 转化收割</td>
+          <td>内容放大（Recap/KOL 长视频/UGC 二创）+ retargeting + 折扣促单</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>① 预热期细分</h4><span class="tag">10/2–10/15</span></div>
+    <table class="swiss">
+      <thead><tr><th>子阶段</th><th>时间</th><th>打法</th><th>输出物</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">种草期</td><td>10/2–10/6</td>
+          <td>审美向&amp;功能向KOC/KOL持续触达 + KOL 开箱测评长视频——定向扩大注意力池子</td>
+          <td>场景内容、KOC 开箱/佩戴、KOL 开箱测评长视频</td>
+        </tr>
+        <tr>
+          <td class="strong">官宣期</td><td>10/7–10/11</td>
+          <td>官宣「TICKEY × BBF 摊位 + 数字工牌赞助」，放主视觉与现场玩法预告（摄影师抓拍/抽奖/现货）</td>
+          <td>官宣视频、玩法预告卡</td>
+        </tr>
+        <tr>
+          <td class="strong">冲刺期</td><td>10/12–10/15</td>
+          <td>倒计时 + 「到场专属福利」钩子 + 现场动线引导</td>
+          <td>倒计时 story、路线/摊位图</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>② 爆发期细分</h4><span class="tag">10/16–10/18</span></div>
+    <table class="swiss">
+      <thead><tr><th>日期</th><th>关键点</th><th>动作</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">10/16（周五晚）</td>
+          <td>售票开幕式（Michael Lewis × Geraldine Brooks）</td>
+          <td>数字工牌首亮相，抓 Staff/嘉宾合影素材，发 Staff story/reel + 1–2 条高潮预热</td>
+        </tr>
+        <tr>
+          <td class="strong">10/17（周六）</td>
+          <td>主活动日 10:00–18:00</td>
+          <td>场外摄影师引流 + 场内摊位承接 + 实时 story/短视频 + 摄影师联合 Reel，当天 6–8 条</td>
+        </tr>
+        <tr>
+          <td class="strong">10/18（周日）</td>
+          <td>复盘日</td>
+          <td>精选现场 UGC 二次传播，做「一天回顾」混剪，引导补发 + 转私域</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>③ 长尾期细分</h4><span class="tag">10/19–11/1</span></div>
+    <table class="swiss">
+      <thead><tr><th>子阶段</th><th>时间</th><th>动作</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">内容放大 + 再触达</td><td>10/19–10/25</td>
+          <td>内容放大（Recap 视频 + KOL 深度测评长视频 + Staff vlog + UGC 二创）+ 现场素材复用 + 扫码人群首轮 retargeting</td>
+        </tr>
+        <tr>
+          <td class="strong">冲刺促单期</td><td>10/26–11/1</td>
+          <td>折扣码到期倒计时促单；社群导流沉淀</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════ 04 内容策划 ═══════════ -->
+  <section id="s4">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">4</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Content / 内容策划</span>
+        <h2 class="sec-title">四、活动内容策划</h2>
+      </div>
+    </div>
+
+    <div class="tbl-head"><h4>1. 线下</h4><span class="tag">Offline</span></div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">01</span>工牌赞助</span>
+    <p class="body" style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;"><span class="strong">行动：</span>TICKEY赞助 BBF 全场 staff 工牌（约 200 位），app中上线BFF Staff专属模板，staff 自行上传照片、姓名。</p>
+    <p class="body" style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;"><span class="strong">目的：</span><span style="color:var(--red);">把「赞助方宣传」变成「纪念品」；每位 staff 自带一块流动的 TICKEY demo。</span></p>
+
+    <div class="img-row">
+      <img src="media/staff-badge-single.png" alt="工牌赞助示意：单人手举 TICKEY 工牌">
+      <img src="media/staff-badge-group.png" alt="工牌赞助示意：三位 staff 佩戴工牌合影">
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">02</span>街头摄影师博主场外引流</span>
+    <div class="gray-sm">
+    <p class="body"><span class="strong">行动：</span></p>
+    <ul class="list">
+      <li>街头摄影师博主在会场附近用邀请路人拍摄，将照片现场上传到TICKEY，供路人佩戴（重点目标：看起来社媒活跃度高的路人&amp;叙述感强的画面）</li>
+      <li>摄影师口头获得路人社媒发布许可+引导被拍路人到TICKEY摊位进行领取奖品、产品体验</li>
+      <li>摄影师记录全程POV，作为后续视频素材</li>
+    </ul>
+    <p class="body"><span class="strong">目的：</span></p>
+    <ul class="list">
+      <li style="color:var(--red);">引流现场路人到TICKEY摊位进行体验，激发兴趣和购买欲</li>
+      <li style="color:var(--red);">惊喜照片+TICKEY挂件激发被抓拍者社媒分享欲，创造UGC</li>
+      <li style="color:var(--red);">为活动主题视频积累素材，构建有温度的活动叙事</li>
+    </ul>
+
+    <div class="img-one">
+      <img src="media/staff-badge-street.png" alt="手持复古齿边 TICKEY 工牌">
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">03</span>场内摊位体验</span>
+    <p class="body"><span class="strong">行动</span></p>
+    <p class="body"><span class="strong" style="color:var(--red);">现场引导体验</span></p>
+    <ul class="list">
+      <li>传图：手机照片一键传到 TICKEY，3s快刷</li>
+      <li>功能切换：照片 / 天气日历/ Checklist/ 番茄钟等模式切换演示</li>
+      <li>佩戴 + 磁吸：引导试戴，磁吸固定与取下</li>
+      <li>NFC 分享：轻触即弹品牌 linktree（Instagram / TikTok / 官网），引导关注</li>
+    </ul>
+
+    <span class="label" style="color:var(--red);">引导抽奖</span>
+    <table class="swiss">
+      <thead><tr><th>奖项</th><th>奖品</th></tr></thead>
+      <tbody>
+        <tr><td>一等奖</td><td>TICKEY 一台 *10</td></tr>
+        <tr><td>二等奖</td><td>品牌帆布包 *60</td></tr>
+        <tr><td>参与奖</td><td>TICKEY 设计感书签（不限量）</td></tr>
+        <tr><td>摄影师奖励</td><td>持摄影师拍摄照片到摊的用户，统一送品牌帆布包</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="img-row3">
+      <img src="media/booth-bookmark.png" alt="赠品书签场景示意">
+      <img src="media/booth-scene.png" alt="图书节摊位现场示意">
+      <img src="media/booth-photo.png" alt="摊位体验示意">
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">04</span>线下物料表</span>
+    <table class="swiss">
+      <thead><tr><th>物料</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">磁吸洞洞板（主视觉墙）</td><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">产品磁吸上板，突出显示TICKEY名称和SLOGAN，强化品牌识别；两边挂品牌帆布包 + BBF tote，展示核心包挂场景；</td></tr>
+        <tr><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">立柱小屏</td><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">循环产品场景小片，路人秒懂「怎么用」</td></tr>
+        <tr><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">抽奖机</td><td style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;">互动性强，打印出来的抽奖小票印有导向私域二维码（官网+ Instagram +TikTok + Discord）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>2. 线上</h4><span class="tag">Online</span></div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">01</span>活动 Recap 视频（30–60s）&amp; Vlog</span>
+    <div class="gray-sm">
+    <table class="swiss">
+      <thead><tr><th>时间轴</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">0–3s Hook</td><td>快剪现场人流 + TICKEY 屏内容切换特写</td></tr>
+        <tr><td class="strong">3–20s 产品</td><td>秒懂怎么用（贴/挂/夹、3s 换屏），主视觉墙磁吸展示</td></tr>
+        <tr><td class="strong">20–40s 人群</td><td>staff 工牌、路人惊喜拍摄、抽奖、现场成交的真实反应</td></tr>
+        <tr><td class="strong">40–55s 场景</td><td>包挂 / 胸前佩戴的 UGC 画面</td></tr>
+        <tr><td class="strong">55–60s 落点</td><td>产品名 + slogan + linktree / 摊位定位</td></tr>
+      </tbody>
+    </table>
+    <p class="body">配乐：轻快有节奏、朝气向；产品名识别突出。</p>
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">02</span>摄影师联合 Reel</span>
+    <div class="gray-sm">
+    <table class="swiss">
+      <thead><tr><th>段</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">开场</td><td>摄影师街拍视角，邀请路人拍摄</td></tr>
+        <tr><td class="strong">动作</td><td>上传照片到TICKEY，路人挂到包包上</td></tr>
+        <tr><td class="strong">引导</td><td>手指照片上的 TICKEY 名字：「可以到 TICKEY 摊位体验更多功能，作为今天的幸运儿还可以领取一个漂亮的帆布小包」</td></tr>
+        <tr><td class="strong">素材</td><td>多组路人把 TICKEY 当包挂使用的真实画面</td></tr>
+        <tr><td class="strong">落点</td><td>自然 outro，背景为现场产品场景使用图，品牌产品名 + slogan</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">03</span>BBF官号Staff story&amp;reel</span>
+    <div class="gray-sm">
+    <p class="body">200 位 staff 本身都带着同一块 TICKEY 工牌，他们就是现场 KOC。「有纪念意义的工牌」是最容易自发生成的内容点，比「官方合作宣传」真实亲切得多。</p>
+    <table class="swiss">
+      <thead><tr><th>内容点</th><th>打法</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">开场</td><td>staff 对镜头亮出胸前工牌，屏上显示自己名字 + BBF logo</td></tr>
+        <tr><td class="strong">中间</td><td>合照：staff 互相用工牌合影，与同事/志愿者/观众/摊位合照，工牌入镜成为集体记忆点</td></tr>
+        <tr><td class="strong">落点</td><td>「这不是一次性的工牌，是一块能带回家的纪念品」</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">04</span>EDM规划</span>
+    <div class="scroll gray-sm">
+      <table class="swiss">
+        <thead><tr><th>阶段</th><th>ED</th><th>主题行 subject</th><th>副标题 preheader</th><th>目标人群</th><th class="num">数量</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>官宣期</td><td>活动预告</td>
+            <td class="strong">TICKEY is coming to the Boston Book Festival 🎪</td>
+            <td>Boston Book Festival · Oct 17 · Copley Square</td><td>全部用户</td><td class="num">1</td>
+          </tr>
+          <tr>
+            <td>冲刺期</td><td>倒计时</td>
+            <td class="strong">3 days — meet TICKEY at BBF + on-site perks</td>
+            <td>On-site: street portraits + giveaways</td><td>全部用户</td><td class="num">1</td>
+          </tr>
+          <tr>
+            <td>长尾期</td><td>活动后复盘+折扣</td>
+            <td class="strong">Your moment, captured — BBF recap + 10% off</td>
+            <td>Recap + 10% off — ends soon</td><td>全部用户</td><td class="num">1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <span class="label" style="font-family:var(--sans);font-size:15px;color:#232323;letter-spacing:0;text-transform:none;"><span style="font-family:var(--mono);font-size:12px;color:var(--red);letter-spacing:.1em;margin-right:8px;">05</span>独立站落地页规划</span>
+    <table class="swiss">
+      <thead><tr><th>阶段</th><th>落地页内容</th><th>核心动作</th></tr></thead>
+      <tbody>
+        <tr><td>预热期（10/2–10/15）</td><td>活动倒计时 + 玩法预告 + 提前订阅钩子</td><td>留资（Email、Discord）</td></tr>
+        <tr><td>爆发期（10/16–10/18）</td><td>现货购买 + 现场抽奖引导 + 摊位定位</td><td>现场成交 + 扫码留资</td></tr>
+        <tr><td>长尾期（10/19–11/1）</td><td>折扣码倒计时 + UGC 墙 + 私域入口</td><td>促单 + 沉淀</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════ 05 媒介策划 ═══════════ -->
+  <section id="s5">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">5</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Media / 媒介策划</span>
+        <h2 class="sec-title">四、媒介策划</h2>
+      </div>
+    </div>
+
+    <div class="tbl-head"><h4>1. 红人渠道规划</h4><span class="tag">Influencers</span></div>
+
+    <span class="label">IG/TikTok/YT Shorts</span>
+    <table class="swiss">
+      <thead><tr><th>阶段</th><th>红人类型（#tag）</th><th>内容主题</th><th>CTA</th><th class="num">数量</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>预热期</td>
+          <td class="eng">#aesthetics #bagcharm #techgadgets #desksetup</td>
+          <td>场景审美向展示 + 功能向展示 + 开箱体验</td><td>Link in bio（软引导官网）</td><td class="num">6-8 位</td>
+        </tr>
+        <tr>
+          <td>爆发期</td>
+          <td class="eng">#aesthetics #bagcharm #techgadgets #desksetup #本地KOC</td>
+          <td>场景审美向展示 + 活动现场 UGC</td><td>Meet TICKEY at BBF</td><td class="num">3-5 位</td>
+        </tr>
+        <tr>
+          <td>长尾期</td>
+          <td class="eng">#aesthetics #bagcharm #techgadgets #desksetup</td>
+          <td>场景审美向展示 + 功能向展示</td><td>Link in bio + discount code</td><td class="num">3-5 位</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <span class="label">YouTube</span>
+    <table class="swiss">
+      <thead><tr><th>阶段</th><th>红人类型（#tag）</th><th>内容主题</th><th>CTA</th><th class="num">数量</th></tr></thead>
+      <tbody>
+        <tr><td>预热期</td><td class="eng">#techreview #unboxing #desksetup #maker</td><td>长视频深度测评（开箱功能介绍）</td><td>Link in bio</td><td class="num">1位</td></tr>
+        <tr><td>长尾期</td><td class="eng">#techreview #unboxing #desksetup #maker</td><td>长视频深度测评（开箱功能介绍）</td><td>Link in bio</td><td class="num">1位</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>2. 社媒内容分发</h4><span class="tag">Content Calendar</span></div>
+    <div class="scroll">
+      <table class="swiss">
+        <thead><tr><th>阶段</th><th>内容资产</th><th>平台</th><th>形式</th><th class="num">内容数量</th></tr></thead>
+        <tbody>
+          <tr><td>预热·种草</td><td>场景审美向展示 + 开箱体验 + 深度测评</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels / Carousel</td><td class="num">8</td></tr>
+          <tr><td>预热·种草</td><td>长视频深度测评（开箱功能介绍）</td><td>Youtube</td><td>长视频</td><td class="num">1</td></tr>
+          <tr><td>预热·官宣</td><td>官宣视频 + 玩法预告卡</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels + Story</td><td class="num">官宣 1 + 预告 2–3</td></tr>
+          <tr><td>预热·冲刺</td><td>倒计时 + 路线/摊位图</td><td>IG / TikTok / FB / YT Shorts</td><td>Story 系列</td><td class="num">倒计时 3–4 + 路线图 1</td></tr>
+          <tr><td>爆发 10/16</td><td>数字工牌首亮相</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels / Story</td><td class="num">1–2</td></tr>
+          <tr><td>爆发 10/17</td><td>现场实时 story / 短视频</td><td>IG / TikTok / FB / YT Shorts</td><td>Story + Reels</td><td class="num">story 6–8 +  2–3</td></tr>
+          <tr><td>爆发 10/17</td><td>摄影师联合 Reel</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels + Story</td><td class="num">2</td></tr>
+          <tr><td>爆发 10/17</td><td>Staff story / reel</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels</td><td class="num">3–5</td></tr>
+          <tr><td>爆发 10/18</td><td>一天回顾混剪</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels</td><td class="num">1</td></tr>
+          <tr><td>长尾</td><td>Recap 视频（30–60s）</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels</td><td class="num">1</td></tr>
+          <tr><td>长尾</td><td>活动日staff vlog</td><td>Youtube</td><td>长视频</td><td class="num">1</td></tr>
+          <tr><td>长尾</td><td>场景审美向展示 + 功能向展示</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels / Carousel</td><td class="num">2-3</td></tr>
+          <tr><td>长尾</td><td>KOL深度测评长视频</td><td>YouTube</td><td>长视频</td><td class="num">1</td></tr>
+          <tr><td>长尾</td><td>UGC 二创</td><td>IG / TikTok / FB / YT Shorts</td><td>Reels</td><td class="num">1-2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tbl-head"><h4>3. PR</h4><span class="tag">Press</span></div>
+    <table class="swiss">
+      <thead><tr><th>阶段</th><th>媒体/平台</th><th>内容</th><th class="num">数量</th></tr></thead>
+      <tbody>
+        <tr><td>预热期 + 爆发期</td><td>波士顿本地newsletter+垂媒</td><td>品牌公告向：TICKEY×BBF 合作 + 现场街拍机会 + 抽奖</td><td class="num">6</td></tr>
+        <tr><td>长尾期</td><td>垂媒</td><td>成果稿：互动 / UGC</td><td class="num">1-2</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tbl-head"><h4>4. 私域渠道</h4><span class="tag">Owned</span></div>
+    <div class="gray-sm">
+    <table class="swiss">
+      <thead><tr><th>渠道</th><th>角色</th><th>动作</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Email</td><td>转化收割</td><td>按上面 EDM规划 发 3 次邮件，激活线索（预告 → 倒计时 → 复盘+折扣）</td></tr>
+        <tr><td class="strong">Discord</td><td>生态引擎</td><td>现场照片实时同步 + 制造社区氛围 + 抽奖导向</td></tr>
+        <tr><td class="strong">FB Group</td><td>轻量维护</td><td>目前人比较少，活动内容一键同步，不单独投入（低频维护）</td></tr>
+        <tr><td class="strong">官网 blog</td><td>信任 + SEO 收口</td><td>活动 recap + 品牌叙事</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ═══════════ 06 广告规划 ═══════════ -->
+  <section id="s6">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">6</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Ads / 广告规划</span>
+        <h2 class="sec-title">五、广告规划</h2>
+      </div>
+    </div>
+
+    <table class="swiss">
+      <thead><tr><th>渠道</th><th>投放</th><th>目标</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Meta（IG + FB）</td><td>Reels / Story / Carousel + DPA 再营销</td><td>Awareness + Traffic 为主，Conversion 收口</td></tr>
+        <tr><td class="strong">Google Search</td><td>品牌词 + 长尾品类词 + Shopping/PMax</td><td>意向承接（Traffic / Conversion）</td></tr>
+        <tr><td class="strong">YouTube</td><td>Shorts 广告</td><td>Awareness</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════ 07 预算拆分 ═══════════ -->
+  <section id="s7">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">7</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Budget / 预算</span>
+        <h2 class="sec-title">六、预算拆分</h2>
+      </div>
+    </div>
+
+    <table class="swiss">
+      <thead><tr><th>项目</th><th class="num">预算</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">线下（摊位+搭建+工牌200+抽奖）</td><td class="num red">$10K</td><td>赞助工牌 200 成本价 + 搭建 + 抽奖（10 台 + 60 包 + 不限量书签）+ 摄影师</td></tr>
+        <tr><td class="strong">内容制作（官宣片/摄影师 Reel/Recap/Staff vlog/红人素材）</td><td class="num red">$8K</td><td>制作 + 剪辑</td></tr>
+        <tr><td class="strong">KOL/KOC（IG/TikTok 12–18 位 + YouTube 2 位）</td><td class="num red">$6K</td><td>合作费 + 寄送</td></tr>
+        <tr><td class="strong">PR（本地 newsletter 6 + 垂媒 1–2）</td><td class="num red">$4K</td><td>newsletter 单篇 $250–1K + 垂媒</td></tr>
+        <tr><td class="strong">付费广告（Meta 65% / Google 35%）</td><td class="num red">$12K</td><td></td></tr>
+        <tr><td class="strong">合计</td><td class="num red" style="font-weight:800;">$40K</td><td></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════ 08 效果&效率衡量 ═══════════ -->
+  <section id="s8">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">8</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Measurement / 衡量</span>
+        <h2 class="sec-title">七、效果&amp;效率衡量</h2>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="tbl-head"><h4>效果衡量 · 认知</h4><span class="tag">「首次了解 + 建立潮流配饰认知」</span></div>
+        <table class="swiss">
+          <thead><tr><th>指标</th><th class="num">目标值</th></tr></thead>
+          <tbody>
+            <tr><td>红人总曝光</td><td class="num">400K</td></tr>
+            <tr><td>社媒总曝光（含广告）</td><td class="num">1M</td></tr>
+            <tr><td>PR 总曝光（newsletter + 垂媒）</td><td class="num">250K</td></tr>
+            <tr><td>线下曝光/真实体验触达量（抽奖参与估计）</td><td class="num">250,000；1,200</td></tr>
+            <tr><td>Google 品牌搜索量增长</td><td class="num" style="font-size:11px;">+40%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="metric">
+        <div class="tbl-head"><h4>效果衡量 · 信任</h4><span class="tag">「相信这是值得入手的潮流配饰」</span></div>
+        <table class="swiss">
+          <thead><tr><th>指标</th><th class="num">目标值</th></tr></thead>
+          <tbody>
+            <tr><td>评论数 / 正向占比</td><td class="num">500 条 / ≥80%</td></tr>
+            <tr><td>UGC 自发条数</td><td class="num">≥25 条</td></tr>
+            <tr><td>社媒涨粉 / EDM 订阅</td><td class="num">2,000 / 800</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="metric">
+        <div class="tbl-head"><h4>效果衡量 · 转化</h4><span class="tag">「完成首单（线上 / 线下）」</span></div>
+        <table class="swiss">
+          <thead><tr><th>指标</th><th class="num">目标值</th></tr></thead>
+          <tbody>
+            <tr><td>线下现货成交</td><td class="num">50台</td></tr>
+            <tr><td>线上增量成交（减去基本日均180台）（9.28-11.1）</td><td class="num">1,000单，日均单量增长20%</td></tr>
+            <tr><td>整体ROI目标</td><td class="num" style="font-size:11px;">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="metric metric-full">
+        <div class="tbl-head"><h4>效率衡量</h4><span class="tag">Efficiency</span></div>
+        <table class="swiss">
+          <thead><tr><th>维度</th><th>指标</th><th class="num">目标值</th></tr></thead>
+          <tbody>
+            <tr><td class="strong">性价比</td><td style="color:var(--red);">campaign全程监控CPUV，把预算往效率最高的渠道挪。</td><td class="num">整体目标CPUV 0.02 USD</td></tr>
+            <tr><td class="strong">传播势能</td><td>自然曝光/付费曝光 ≥ 1</td><td class="num" style="font-size:11px;">≥ 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 09 风险预案 ═══════════ -->
+  <section id="s9">
+    <div class="sec-head">
+      <div class="sec-num">0<span class="accent">9</span></div>
+      <div class="sec-title-box">
+        <span class="sec-en">Risk / 风险预案</span>
+        <h2 class="sec-title">八、风险和预案</h2>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <table class="swiss">
+        <thead><tr><th>#</th><th>风险</th><th>影响</th><th>预案</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="strong">1</td>
+            <td class="strong">BBF 品牌名义使用边界（「TICKEY × BBF」宣传 + 预载 BBF 定制页 + 活动 tag）</td>
+            <td>高</td>
+            <td>赞助协议明确活动名义/logo/定制页内容授权范围 + 文案预审 + tag 以官方 @bostonbookfest 最终确认为准</td>
+          </tr>
+          <tr>
+            <td class="strong">2</td>
+            <td class="strong">工作人员不宣传（200 块工牌赞助回报落空）</td>
+            <td>高</td>
+            <td>① 协议明确「至少 2 条社媒 + 口头提及」；② 备好「话术 + 一键可发图」，把执行成本降到 0；</td>
+          </tr>
+          <tr>
+            <td class="strong">3</td>
+            <td class="strong">品牌词搜索承接不住（线下反哺线上战略落空）</td>
+            <td>高</td>
+            <td>活动前上线 BBF 落地页 + 品牌词 SEM 加预算 + 确认官网 SEO 品牌词排名 + 落地页/NFC 链接做压力测试</td>
+          </tr>
+          <tr>
+            <td class="strong">4</td>
+            <td class="strong">现场人流 / 触达不达预期（1,200 触达、25 UGC、50 台现货全落空）</td>
+            <td>高</td>
+            <td>① 争取街市人流主通道摊位；② 场外街头摄影师 POV 引流回摊；③ 与相邻展商互相导流；④ 人流不够时长尾期广告加量补触达</td>
+          </tr>
+          <tr>
+            <td class="strong">5</td>
+            <td class="strong">线上增量 1,000 单不达（ROAS 2 落空）</td>
+            <td>高</td>
+            <td>① 长尾期广告加量 + DPA 再营销；② 折扣码延期倒计时促单；</td>
+          </tr>
+          <tr>
+            <td class="strong">6</td>
+            <td class="strong">KOL/KOC 跳票 / 内容质量差（红人 400K 曝光落空）</td>
+            <td>中</td>
+            <td>① 签约锁交付日期 + 分批寄送分散风险；② 备选红人池 3–5 位随时补位；③ 自有内容（摄影师 POV/Staff vlog）兜底</td>
+          </tr>
+          <tr>
+            <td class="strong">7</td>
+            <td class="strong">PR 不刊登 / 稿子发不出去（250K PR 曝光落空）</td>
+            <td>中</td>
+            <td>① newsletter 多投两家分散风险；② 成果稿提前备好数据</td>
+          </tr>
+          <tr>
+            <td class="strong">8</td>
+            <td class="strong">天气（户外街市，风雨）</td>
+            <td>中</td>
+            <td>备雨棚+防水套；提前 3 天盯 10/17 预报，极端天气转「线上为主」预案</td>
+          </tr>
+          <tr>
+            <td class="strong">9</td>
+            <td class="strong">现场现货库存失衡（备多压货 / 备少断货）</td>
+            <td>中</td>
+            <td>备 50 台现货 + 预留预售链路（现场断货立即转线上预购送同款赠品），卖超预期不丢单、卖不动不压货</td>
+          </tr>
+          <tr>
+            <td class="strong">10</td>
+            <td class="strong">现场设备 / 物料故障（墨水屏、NFC、磁吸板、拍立得）</td>
+            <td>中</td>
+            <td>备机 + 备用面板 + 备用贴纸 + 现场专人盯设备；</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div class="col">
+      <span>TICKEY × BBF — 线上线下整合营销案</span>
+      <span>Mockup · Swiss Style · Helvetica</span>
+    </div>
+  </footer>
+
+</div>
+<script src="transcripts.js"></script>
+<script>
+  history.scrollRestoration = 'manual';
+  window.addEventListener('load', function () {
+    window.scrollTo(0, 0);
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  });
+
+  // 左侧导航滚动高亮（scrollspy）
+  var sections = document.querySelectorAll('section[id]');
+  var links = document.querySelectorAll('.sidebar nav a');
+  var linkMap = {};
+  links.forEach(function (a) { linkMap[a.getAttribute('href').slice(1)] = a; });
+  function setActive(id) {
+    links.forEach(function (l) { l.classList.remove('active'); });
+    if (linkMap[id]) linkMap[id].classList.add('active');
+  }
+  var spy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) setActive(e.target.id);
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  sections.forEach(function (s) { spy.observe(s); });
+
+  // 导航栏录音播放（点击 ▶/时长 均可播放，点击标题仍可跳转）+ 实时字幕
+  var player = new Audio();
+  var currentItem = null;
+  var caption = document.getElementById('caption');
+
+  function showCaption(item) {
+    var a = item.closest('a');
+    document.getElementById('capId').textContent = a.querySelector('.n').textContent;
+    document.getElementById('capTitle').textContent = a.querySelector('.t').textContent;
+    document.getElementById('capText').textContent = '';
+    caption.classList.add('on');
+  }
+  function currentSegs() {
+    if (!currentItem) return null;
+    var key = currentItem.closest('a').getAttribute('href').slice(1);
+    return (typeof TRANSCRIPTS !== 'undefined' && TRANSCRIPTS[key]) ? TRANSCRIPTS[key] : null;
+  }
+
+  document.querySelectorAll('.sidebar nav a .aud').forEach(function (item) {
+    item.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var src = item.getAttribute('data-src');
+      var btn = item.querySelector('.play');
+      if (currentItem === item) {
+        if (player.paused) { player.play(); btn.textContent = '■'; btn.classList.add('playing'); }
+        else { player.pause(); btn.textContent = '▶'; btn.classList.remove('playing'); }
+        return;
+      }
+      if (currentItem) { var ob = currentItem.querySelector('.play'); ob.textContent = '▶'; ob.classList.remove('playing'); }
+      currentItem = item;
+      player.src = src;
+      player.play();
+      btn.textContent = '■';
+      btn.classList.add('playing');
+      showCaption(item);
+    });
+  });
+
+  player.addEventListener('timeupdate', function () {
+    var segs = currentSegs();
+    if (!segs) return;
+    var t = player.currentTime, text = '';
+    for (var i = 0; i < segs.length; i++) {
+      if (t >= segs[i].s && t < segs[i].e) { text = segs[i].t; break; }
+    }
+    if (!text) {
+      for (var j = segs.length - 1; j >= 0; j--) { if (segs[j].s <= t) { text = segs[j].t; break; } }
+    }
+    document.getElementById('capText').textContent = text;
+  });
+
+  player.addEventListener('ended', function () {
+    if (currentItem) { var b = currentItem.querySelector('.play'); b.textContent = '▶'; b.classList.remove('playing'); currentItem = null; }
+    caption.classList.remove('on');
+  });
+</script>
+</body>
+</html>

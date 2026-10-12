@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>直播购物：从大屏到小屏 — 中美 40 年演变时间线</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --panel:#ffffff;
+    --ink:#111111;
+    --muted:#8a8a8a;
+    --faint:#c9c9c9;
+    --line:#eaeaea;
+    --spine:#d9d9d9;
+    --us:#111111;
+    --cn:#b03a2e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Lato",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Helvetica,Arial,sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{display:flex;height:100vh;width:100%}
+
+  /* ===== 左侧：单条时间轴（默认铺满） ===== */
+  .timeline-panel{
+    flex:1 1 auto;min-width:0;display:flex;flex-direction:column;
+    background:var(--panel);border-right:1px solid var(--line);
+  }
+  .panel-header{
+    flex:0 0 auto;padding:34px 52px 18px;
+  }
+  .panel-header h1{font-size:30px;font-weight:300;letter-spacing:.4px;line-height:1.1}
+  .back-home{display:inline-block;font-size:13px;font-weight:400;color:var(--muted);text-decoration:none;letter-spacing:.5px;margin-bottom:22px}
+  .back-home:hover{color:var(--ink)}
+  .panel-header .sub{font-size:14px;font-weight:300;color:#4a4a4a;margin-top:14px;letter-spacing:.3px;line-height:1.85}
+  .sub-gifs{display:flex;gap:16px;margin-top:18px;align-items:flex-start;flex-wrap:wrap}
+  .sub-gifs img{max-width:340px;width:calc(50% - 8px);height:auto;border:1px solid var(--line);display:block;background:#fff}
+  .legend{
+    display:flex;align-items:center;gap:22px;margin-top:20px;padding-top:16px;
+    border-top:1px solid var(--line);font-size:12px;color:var(--muted);letter-spacing:.5px;
+  }
+  .legend span{display:flex;align-items:center;gap:7px}
+  .legend i{width:8px;height:8px;display:inline-block}
+  .legend i.us{background:var(--us)} .legend i.cn{background:var(--cn)}
+  .legend .note{color:var(--muted)}
+
+  .timeline-scroll{
+    flex:1 1 auto;overflow-y:auto;padding:8px 52px 90px;
+    scrollbar-width:thin;scrollbar-color:#d8d8d8 transparent;
+  }
+  .timeline-scroll::-webkit-scrollbar{width:9px}
+  .timeline-scroll::-webkit-scrollbar-thumb{background:#d8d8d8}
+
+  #timeline{position:relative}
+  .spine{
+    position:absolute;left:50%;width:1px;transform:translateX(-50%);
+    background:var(--spine);
+  }
+  .tick{position:absolute;left:50%;transform:translate(-50%,-50%);border-radius:50%}
+  .node{position:absolute;left:0;width:100%;transform:translateY(-50%)}
+  .node .card{
+    position:absolute;top:0;transform:translateY(-50%);
+    width:calc(50% - 44px);max-width:420px;background:var(--bg);
+    padding:6px 0 14px;
+    cursor:pointer;
+  }
+  .node.us .card{right:calc(50% + 36px);text-align:right}
+  .node.cn .card{left:calc(50% + 36px);text-align:left}
+  .card .yr{font-size:24px;font-weight:300;line-height:1;color:var(--ink);letter-spacing:.3px}
+  .card .yr.long{font-size:16px}
+  .card .desc{font-size:12.5px;font-weight:300;color:var(--muted);line-height:1.65;margin-top:10px}
+  .card .play{
+    margin-top:12px;font-size:11px;font-weight:400;color:#fff;letter-spacing:.6px;
+    display:none;align-items:center;gap:6px;
+    background:var(--us);padding:7px 14px;border-radius:999px;
+    box-shadow:0 1px 3px rgba(0,0,0,.12);
+    transition:background .2s ease, transform .2s ease;
+  }
+  .node.cn .card .play{background:var(--cn)}
+  .node.has-video .play{display:inline-flex}
+  .node .card:hover .play{transform:translateY(-1px)}
+  .node.active .card .play{box-shadow:0 2px 6px rgba(0,0,0,.2)}
+  .node .card:hover .yr{color:var(--us)}
+  .node.cn .card:hover .yr{color:var(--cn)}
+  .node.active .card .yr{color:var(--us)}
+  .node.cn.active .card .yr{color:var(--cn)}
+
+  /* ===== 右侧：视频播放器（默认收起） ===== */
+  .player-panel{
+    flex:0 0 auto;width:0;display:flex;flex-direction:column;background:var(--bg);
+    overflow:hidden;transition:width .6s cubic-bezier(.4,0,.2,1);
+  }
+  .app.with-video .player-panel{width:44%}
+  .player-sticky{display:flex;flex-direction:column;height:100vh;padding:34px;gap:20px}
+  .player-frame{
+    flex:0 0 auto;background:#0e0e0e;overflow:hidden;aspect-ratio:16/9;
+    opacity:0;transform:translateX(24px);
+    transition:opacity .5s ease .05s,transform .6s cubic-bezier(.4,0,.2,1);
+  }
+  .app.with-video .player-frame{opacity:1;transform:translateX(0)}
+  .player-frame video{width:100%;height:100%;display:block;object-fit:contain;background:#0e0e0e}
+  .player-frame.hidden{display:none}
+  .video-caption{
+    flex:0 0 auto;font-size:13px;font-weight:300;color:var(--ink);line-height:1.7;
+    border-top:1px solid var(--line);padding-top:16px;
+    opacity:0;transform:translateX(16px);
+    transition:opacity .5s ease .15s,transform .6s cubic-bezier(.4,0,.2,1);
+  }
+  .app.with-video .video-caption{opacity:1;transform:translateX(0)}
+  .video-caption b{font-weight:400;color:var(--cn)}
+  .video-caption:empty{display:none}
+
+  /* ===== 下方正文：分类讨论 · 疑问疏解 · 品牌案例 ===== */
+  .article{max-width:780px;margin:0 auto;padding:110px 48px 140px;border-top:1px solid var(--line)}
+  .article .lead{font-size:16px;font-weight:300;line-height:2;color:#333;margin:0 0 16px}
+  .article h2{font-size:26px;font-weight:300;letter-spacing:.4px;color:var(--ink);margin:76px 0 10px}
+  .article h2 .no{font-size:15px;color:var(--muted);margin-right:14px;letter-spacing:.5px}
+  .article h3{font-size:17px;font-weight:400;color:var(--ink);margin:38px 0 14px;padding-left:13px;border-left:3px solid var(--cn);line-height:1.4}
+  .article h4{font-size:15.5px;font-weight:400;color:var(--ink);margin:0 0 8px;display:flex;align-items:baseline;gap:12px}
+  .article h5{font-size:14px;font-weight:400;color:var(--ink);margin:18px 0 6px}
+  .article p{font-size:14.5px;font-weight:300;line-height:1.95;color:#333;margin:0 0 14px}
+  .article p b{font-weight:400;color:var(--ink)}
+  .article .img-pair{display:flex;gap:16px;margin:18px 0 8px;align-items:flex-start;flex-wrap:wrap}
+  .article .img-pair img{width:calc(50% - 8px);height:auto;border:1px solid var(--line);display:block;background:#fff}
+  @media(max-width:760px){.sub-gifs img,.article .img-pair img{width:100%}}
+  .article .img-single{margin:16px 0 8px}
+  .article .img-single img{max-width:560px;width:100%;height:auto;border:1px solid var(--line);display:block;background:#fff}
+  .article .case-video{display:block;width:100%;max-width:640px;margin:18px 0 8px;border:1px solid var(--line);background:#000}
+  .article .side-note{display:flex;gap:28px;align-items:flex-start;margin:18px 0 24px;flex-wrap:wrap}
+  .article .side-note-text{flex:1 1 360px;min-width:0}
+  .article .side-note-text p:last-child{margin-bottom:0}
+  .article .side-note-fig{flex:0 0 auto;max-width:340px;margin:0}
+  .article .side-note-fig img{width:100%;height:auto;border:1px solid var(--line);display:block;background:#fff}
+  .article .side-note-fig figcaption{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.6}
+  .article .dim{font-size:12.5px;color:var(--muted);line-height:1.8;margin:0 0 14px}
+  .article table{width:100%;border-collapse:collapse;margin:16px 0 20px;font-size:13.5px;font-weight:300}
+  .article th,.article td{border:1px solid var(--line);padding:11px 14px;text-align:left;vertical-align:top;line-height:1.75}
+  .article th{background:#fafafa;font-weight:400;color:var(--ink);white-space:nowrap}
+  .article td{color:#333}
+  .article td.lead-col{font-weight:400;color:var(--ink);white-space:nowrap;background:#fcfcfc}
+  .article a{color:var(--cn);text-decoration:none;border-bottom:1px solid #e6c4c0}
+  .article a:hover{border-bottom-color:var(--cn)}
+  .article ul{list-style:none;margin:0 0 16px}
+  .article ul li{font-size:14.5px;font-weight:300;line-height:1.95;color:#333;padding-left:18px;position:relative;margin:0 0 8px}
+  .article ul li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--faint)}
+  .article .note{font-size:12.5px;color:var(--muted);line-height:1.8;margin:10px 0 0;padding:10px 14px;background:#fafafa;border-radius:5px}
+  .article .qa{margin:0 0 34px}
+  .article .qa .q{font-size:16px;font-weight:400;color:var(--ink);line-height:1.7;margin:0 0 14px}
+  .article .qa .q::before{content:"Q";display:inline-block;font-size:11.5px;color:#fff;background:var(--cn);border-radius:3px;padding:1px 8px;margin-right:10px;letter-spacing:.5px;transform:translateY(-2px)}
+  .article .qa .a{padding-left:2px}
+  .article .qa .a p{margin:0 0 12px}
+  .article .qa .a p:last-child{margin-bottom:0}
+  .article .case{margin:0 0 38px}
+  .article .case .tag{font-size:12px;font-weight:300;color:var(--muted);letter-spacing:.5px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="timeline-panel">
+    <header class="panel-header">
+      <a class="back-home" href="index.html">← 返回主页</a>
+      <h1>直播购物：从大屏到小屏</h1>
+      <div class="sub">相信大家亲身经历了直播购物从电视机到手机小屏幕的发展过程——小时候看过好易购、快乐购之类的全天候带货直播频道，也亲身经历了 2018、19 年李佳琦爆火、手机直播间购物真正进入大众生活。美国市场也经历着类似的变化。</div>
+      <div class="sub-gifs">
+        <img src="media/halo-bolt-loop.gif" alt="直播购物演变 GIF ①">
+        <img src="media/livestream-gif.gif" alt="直播购物演变 GIF ②">
+      </div>
+      <div class="legend">
+        <span><i class="us"></i>美国</span>
+        <span><i class="cn"></i>中国</span>
+        <span class="note">▶ 含视频案例</span>
+      </div>
+    </header>
+    <div class="timeline-scroll">
+      <div id="timeline"></div>
+    </div>
+  </aside>
+
+  <section class="player-panel">
+    <div class="player-sticky">
+      <div class="player-frame hidden" id="player-frame">
+        <video id="video" controls playsinline></video>
+      </div>
+      <div class="video-caption" id="video-caption"></div>
+    </div>
+  </section>
+</div>
+
+<div class="article">
+  <p class="lead">上方时间线已带我们梳理了中美 40 年直播购物的编年史、观看了各渠道的直播案例；接下来通过分类讨论的方式，深入理解各个渠道的特点。</p>
+
+  <h2><span class="no">二</span>分类讨论</h2>
+
+  <h3>按媒介分</h3>
+  <p><b>电视</b>是单向、定时、稀缺的媒介——频道有限、有节目表、观众只能看不能说。这种「单向、定时、稀缺」本身就是权威的产物。因此像 QVC、GMA Deals 一样的电视购物直播有一套严格的选品、直播推品流程，灵活性低，产品准入门槛高。拿实体零售作比，就是一个花高价摆在商场一楼正中的展台。</p>
+  <p><b>互联网</b>是双向、实时、海量的媒介——人人能开播、随时能播、弹幕评论连麦实时沟通，因此是去中心化的。TikTok 主播和品类成千上万，随时都有人开播，观众边看边问边砍价，主播根据实时反馈现改话术，边聊边买，好比夜市摆摊。</p>
+
+  <h3>按合作模式（2B / 2C）分</h3>
+  <p><b>2B</b>：QVC、HSN 在产品审核通过后通常要求按采购价买断进行合作，卖家把货寄送到指定仓库，钱货两清后库存与售卖由平台全权负责，商品通过他们自己的独立站和 app 出售。据某券商统计，QVC 毛利在 35–40%，他们注重靠选品、供应链、议价来维持高毛利水平。</p>
+  <p>入驻 TikTok 之后，QVC 将商品上架官网的同时也同步上架 TikTok Shop，同时运营自己的 TikTok Affiliate（如何成为 QVC affiliate）。以 QVC 多年合作产品 Halo Jump Starter 为例，TikTok 上大量红人推广的 tag 带 QVC。</p>
+  <div class="img-pair">
+    <img src="media/qvc-tiktok-1.jpg" alt="QVC × TikTok 示意 ①">
+    <img src="media/qvc-tiktok-2.png" alt="QVC × TikTok 示意 ②">
+  </div>
+  <p>GMA Deals / CBS Deals：不买断，走一件代发——平台接单后由卖家直接发货，按采购价结算。同为 2B，但库存风险留在卖家。</p>
+  <p><b>2C</b>：TikTok Shop / Whatnot / eBay Live 都是搭建了一个直播平台，让卖家直接面对客户成交。平台不买断、不囤货，只抽佣，卖家或主播自己开播卖货、自负库存与履约。</p>
+
+  <h3>按准入门槛分</h3>
+  <div class="side-note">
+    <div class="side-note-text">
+      <p><b>高门槛</b>：QVC / HSN / GMA Deals 等有专门的工作人员负责选品、议价，对供应链、产品质量、库存深度、折扣有较高的要求。品牌提交意向后，需要等待采购挑选。</p>
+      <p>这类节目本身就代表一种权威——他们要对自己挑出来的产品负责，卖砸了砸的是自己的牌子。强背书的另一面就是高门槛。</p>
+    </div>
+    <figure class="side-note-fig">
+      <img src="media/qvc-factory-audit.jpg" alt="QVC 采购经理在中国验厂">
+      <figcaption>QVC采购经理在中国验厂</figcaption>
+    </figure>
+  </div>
+  <p><b>低门槛</b>：TikTok、Amazon、eBay、Whatnot，拥有基本资质就能开店，几百万卖家同台。相应地，平台借力也少，平台只提供流量池，成交更多靠品牌方自己把直播间运营好，或者找对达人直播间去借流量，信任靠自己建立。</p>
+
+  <h3>按一口价 / 拍卖分</h3>
+  <p>电视导购、TikTok 做的是一口价；eBay Live 和 Whatnot 做的是拍卖。</p>
+  <p><b>一口价（定价售卖）</b>很好理解：大多数产品可横向比价，一搜就有替代品，所以电视导购和 TikTok 直播能吸引人的关键在于直播间的限时限量促销制造冲动。</p>
+  <p>Whatnot 直播间的成交品类和主流电商平台很不一样：卡牌类占六七成，收藏钱币、女装、奢侈品各占一成左右。卡牌 / 收藏圈能撑起直播交易是因为藏品有稀缺性，买家需要到直播间蹲好货蹲好价。</p>
+  <p>而对大量不卖收藏卡牌钱币的中国商家来说，他们把 TikTok 直播间那一套打法搬到了 Whatnot 和 eBay Live 上，大多用来清尾货、卖二手。同样是制造紧张感，普通直播间制造「限量」的紧张感，竞拍直播间创造了决策时间紧张的感觉以及引入了和其他观众的竞争，催促观众跳过「需求 → 搜索 → 比价 → 决策」的理性链条，进行下单。</p>
+  <p>出价那一刻，消费者常常会产生了「心理所有权」——这件商品仿佛已经属于自己。一旦被别人反超，损失厌恶会驱使他不断追价，把「自己的东西」抢回来。而低起拍价又锚定了一个「并不贵」的初始印象，让人一路加价也不觉得肉疼。所以，直播竞拍有时能拍出比平销更高的价格。</p>
+
+  <h2><span class="no">三</span>疑问疏解</h2>
+  <p class="dim">大致了解各直播渠道后，仍有以下几个疑问，于是查了一些资料试图给出解释（仅供参考）。</p>
+
+  <div class="qa">
+    <p class="q">美国整体直播电商交易量为什么比中国小一个数量级？</p>
+    <div class="a">
+      <p class="dim">这是一个很大的问题，这里无法给出定论，仅以讨论形式呈现观点。</p>
+      <h5>美国直播起步晚</h5>
+      <p>中国从 2016 年就成体系地布局直播电商上下游——平台、主播、MCN、供应链、支付。而美国，TikTok Shop 2023 年才正式上线，Amazon 直播做了多年始终没起来。同时面对 TikTok 的禁令威胁，商家在政策不明朗时选择观望，平台也放慢了投入和基建节奏，整个布局进度自然就滞后了。</p>
+      <h5>关于「购物心智论」</h5>
+      <p>很多地方说美国人购物更理性、中国人更冲动，这种说法比较荒谬，不同论文、不同样本研究甚至会得出完全相反的结论。</p>
+      <p>TikTok Shop 在 2026 年又实现了翻倍增长。可以预见，随着时间推移，美国的直播电商体量会越来越大。</p>
+    </div>
+  </div>
+
+  <div class="qa">
+    <p class="q">晨间电视节目 CBS Mornings 为什么在 2022 年——手机直播购物愈发发达的时间点——增加电视导购环节？</p>
+    <div class="a">
+      <h5>收入压力</h5>
+      <p>流媒体持续分流观众，传统电视广告收入一路下滑，新闻部门必须找新收入源——增加购物环节是变现效率最高的方式。</p>
+      <h5>同行已跑通十年</h5>
+      <p>CBS 长期坚守纯新闻立场，因此 NBC Today 2010 年插入导购栏目、ABC GMA 2011 年跟进时它都没有加入。而 NBC 和 ABC 的 4 分钟购物专栏，都已经做到了每年千万美金级别的收入。</p>
+    </div>
+  </div>
+
+  <div class="qa">
+    <p class="q">Whatnot 和 eBay Live 为什么在美国市场做得这么好？电视购物时代是否有类似的直播拍卖？中国互联网直播是否有这样的模式？</p>
+    <div class="a">
+      <p>eBay 起家时就是做收藏品拍卖，有二手和收藏品（球星卡、球鞋、周边……）的文化土壤；2000 年左右交易模式增加了定价售卖和开放小刀。</p>
+      <p>电视购物时代，只有苏富比 / 佳士得这样的高端拍卖转播。电视转播是极高成本的投入，而拍卖的节奏是一件一件、一单一单地拍；如果拍卖日常消费品，根本不足以覆盖运营成本。所以电视购物时代，只有高客单、高毛利的收藏品拍卖转播。</p>
+      <p>中国也有直播竞拍：早期有做文玩竞拍的微拍堂，2019 年从原先的图文竞拍拓展到直播竞拍；抖音 2021 年开通了直播拍卖。</p>
+    </div>
+  </div>
+
+  <div class="qa">
+    <p class="q">QVC 和 TikTok Live 都有「货找人」「全品类」的特点，且各自是电视购物时代、互联网直播时代的龙头，二者的直播受众画像有何改变？带货品类是否也有变化？</p>
+    <div class="a">
+      <p class="dim">市面上大都流通二手、三手的数据。</p>
+      <h5>受众画像</h5>
+      <p>QVC 频道的核心盘是 50 岁以上女性，平均年龄接近 60 岁，女性占比约 80–85%。TikTok 整体用户虽年轻（68.8% 是 18–34 岁），但在 TikTok Shop 购物的人年龄更大：YouGov 2025 显示 35–54 岁购买率最高（41%），18–34 岁只有 26%。</p>
+      <h5>带货品类</h5>
+      <p>电视时代，QVC 的品类结构是「珠宝起家、家居称王」——1990 年代珠宝一度占销售额 1/3 以上（起步期约 50%），2000 年代后 Home 取代珠宝稳坐第一（长期占 37–45%），一直保持到 2019 年。TikTok Shop 是「美妆 + 女装」的视觉冲动型结构——美区美妆个护 GMV 达 18.3 亿美元、女装内衣约 12 亿美元，前三大类目（美妆、女装、健康）合计吃掉美区超 41% 的销售。</p>
+      <p class="note">说明：TikTok 侧数字均为 TikTok Shop 整体 GMV，未见 TikTok Live 直播带货口径的数据披露。</p>
+    </div>
+  </div>
+
+  <h2><span class="no">四</span>品牌案例</h2>
+  <p>我们公司卖的是普通的电子消费品。根据上面的讨论，应当尝试电视直播、TikTok 两个直播渠道。TikTok 我们已有团队在做，并在一定程度上验证了这个渠道带动销量、带动声量的能力；这里主要分享电视节目相关的品牌案例，考量我们品牌是否可能借助电视导购节目涨声量、引流量。</p>
+
+  <div class="case">
+    <h4>QVC <span class="tag">Today's Special 预告</span></h4>
+    <p>QVC 直播主持人 2026/6/15 当天提前预告 Today's Special 是 Halo Bolt Jumpstarter，当日品牌声量上涨。</p>
+    <div class="img-pair">
+      <img src="media/todays-special-1.png" alt="QVC Today’s Special 预告示意 ①">
+      <img src="media/todays-special-2.jpg" alt="QVC Today’s Special 预告示意 ②">
+    </div>
+  </div>
+
+  <div class="case">
+    <h4>GMA Deals <span class="tag">导购栏目</span></h4>
+    <p>2026/8/26 直播，引流到 <a href="https://www.goodmorningamerica.com/" target="_blank" rel="noopener">goodmorningamerica.com</a> 下单（<a href="https://www.goodmorningamerica.com/shop/story/abc-secret-savings-home-kitchen-135842205" target="_blank" rel="noopener">当日栏目链接</a>）；当天被推荐的 5 个品牌，声量均上涨。</p>
+    <p>2024/5/17「car essentials」主题户外直播，引流到亚马逊 / 沃尔玛成交（属于付费版位类合作，不是常规的采购模式，<a href="https://www.goodmorningamerica.com/shop/story/best-car-essentials-110298517" target="_blank" rel="noopener">栏目链接</a>）。NEXPOW 品牌名多次露出，但 Google Trends 未见当天热度上涨；被推广的充气泵亚马逊 BSR 前三，未见当天排名上升或冲顶。</p>
+    <div class="img-pair">
+      <img src="media/gma-car-essentials-1.png" alt="GMA car essentials 直播示意 ①">
+      <img src="media/gma-car-essentials-2.png" alt="GMA car essentials 直播示意 ②">
+    </div>
+  </div>
+
+  <div class="case">
+    <h4>NBC Today <span class="tag">Deals 专区</span></h4>
+    <p>Deal 网址：<a href="https://deals.today.com/" target="_blank" rel="noopener">deals.today.com</a></p>
+    <ul>
+      <li>8.26 直播（返校主题，数字日历 / 标签机等）：<a href="https://www.today.com/video/get-back-to-school-ready-digital-calendar-label-makers-more-268886597998" target="_blank" rel="noopener">查看视频</a></li>
+      <li>8.27 直播（秋季日常主题，衬衫夹克 / 眼膜等）：<a href="https://www.today.com/video/shop-fall-routine-essentials-shackets-eye-patches-more-268944965807" target="_blank" rel="noopener">查看视频</a></li>
+    </ul>
+    <div class="img-single">
+      <img src="media/nbc-today-deals.png" alt="NBC Today Deals 专区示意">
+    </div>
+  </div>
+
+  <div class="case">
+    <h4>The Price is Right <span class="tag">竞猜节目植入</span></h4>
+    <p>品牌可以通过赞助产品，在节目上进行曝光（<a href="https://www.cbs.com/shows/the_price_is_right/episodes/" target="_blank" rel="noopener">节目官网</a>）。该节目单集稳定有 400 万观众，是美国日间电视的头部节目，观众画像偏女性 25–54 / 家庭主妇，正好是家庭采购决策人群。</p>
+    <p>2026/7/1 播出的节目中，Bird Buddy 智能喂鸟器在节目中作为竞猜产品露出，当天品牌声量上涨。</p>
+    <video class="case-video" src="media/the-price-is-right-sample.mp4" controls playsinline preload="metadata"></video>
+  </div>
+</div>
+
+<script>
+const US = [
+  {label:`1978年`, pos:1978, desc:`佛罗里达州的某区域的一家广播电台同意接收一位广告商的100多个电动开罐器作为赞助品。但这位广告商没有足够的资金支付广告时段的费用，于是电台老板Paxson决定让广播员在广播中拍卖这100个开罐器来赚广告费，结果很快就售罄了。很快，一档做商品促销的广播节目应运而生，名为Suncoast Bargaineers。`},
+  {label:`1982年`, pos:1982, desc:`电台老板Paxson把这个理念推广到了当地的有线电视网络，成立了一个专门的家居购物频道 Home Shopping Channel，简称HSN，这个区域频道很快扩展成全国频道。`, video:`media/HSN1999.mp4`, cap:`HSN 1999 年电视购物节目片段。`},
+  {label:`1986年`, pos:1986, desc:`在美国第四大有线运营商的支持下，对标HSN的电视频道QVC（Quality Value Convenience）诞生了。`, video:`media/qvc2001clip.mp4`, cap:`QVC 2001 年节目片段——「质量 · 价值 · 便利」的 24 小时购物台。`},
+  {label:`1990s-2000s`, pos:1995, desc:`QVC的业务扩展到了英国和墨西哥，甚至在美国线下购物中心开设了门店，踏入了实体零售的领域。到1995年，QVC的收入已经达到了13.91亿美元（达美乐1995年营收9.1亿，ShakeShack2025年营收14.5亿，买香飘飘可以绕地球8圈），CAGR超过120%。`},
+  {label:`2010年`, pos:2010, desc:`QVC的独立站收入占比 2010 年 35.6% → 2011 年 39.7% → 2015 年 47% —— 电视渠道（打电话/遥控器下单）的收入占比逐年走低。全国性晨间新闻节目NBC Today插入导购栏目。`, video:`media/nbctoday2010.mp4`, cap:`NBC Today 2010 年「Jill's Steals and Deals」导购栏目片段。`},
+  {label:`2011年`, pos:2011, desc:`全国性晨间新闻节目GMA也插入导购栏目。`},
+  {label:`2017年`, pos:2017, desc:`QVC收购了HSN。`},
+  {label:`2019年`, pos:2019, desc:`Amazon 上线 Amazon Live。同年，中国服务商 Firework（2017年成立）开始帮 DTC 品牌在自有网站做可购物直播。`},
+  {label:`2020年`, pos:2020, desc:`Meta上线Facebook Live Shopping和Instagram Live Shopping（导流至shopify）。`},
+  {label:`2022年`, pos:2022, desc:`eBay 上线 eBay Live，以邀请制运营；Meta 关闭 Facebook Live Shopping。晨间新闻节目CBS Mornings加入Deals导购环节。`},
+  {label:`2023年`, pos:2023, desc:`TikTokShop在美国正式上线；Meta 关闭 Instagram Live Shopping。eBayLive累计达成1000+场直播，收藏品全年GMV超过100亿美金。`, video:`media/ebaylivelvwalletauctionfrom1_30m.mp4`, cap:`eBay Live 奢侈品（LV 钱包）竞拍直播案例。`},
+  {label:`2024年`, pos:2024, desc:`TikTokShop美区GMV爆发至90亿美金。Whatnot GMV约30亿美金。`, video:`media/whatnot.mp4`, cap:`Whatnot 直播带货片段——社交化、秒杀式、收藏品垂类直播。`},
+  {label:`2025年`, pos:2025, desc:`TikTokShop美区全年GMV 151亿(+64%)，已超过QVC集团全年营收(92亿、-9%)。QVC 4月在TikTok开24/7直播、11月一度成单月最高营收店铺(月$2500万+)。同年Whatnot GMV超80亿美金。eBay Live扩至欧洲澳洲市场，GMV同比 +8x（Q2）/+5x（Q3）。`},
+  {label:`2026年`, pos:2026, desc:`TikTok 3月开通直播竞拍功能对标Whatnot，6月26日年中大促期间设置「拍卖日」，上半年美区GMV 118亿(+103%)；6月QVC做到TikTok Shop全美营收第二、被TikTok Summit封"年度卖家"。Whatnot上半年GMV已超80亿美金；eBayLiveQ2 GMV同比+8x，Q3正式取消邀请制。`},
+];
+const CN = [
+  {label:`1992年`, pos:1992, desc:`广东珠江电视台推出了中国第一档电视购物节目"美的精品TV特惠店"。`},
+  {label:`1996年`, pos:1996, desc:`北京电视台开始推出专业的购物节目。`},
+  {label:`1998年`, pos:1998, desc:`全国各省市运营着500多个大大小小的电视购物节目，市场规模达到了26亿元人民币。彼时中国电视购物的监管不严格，黑五类产品是电视购物的主力军，由于假冒伪劣问题闹出了不少严重的纠纷。`},
+  {label:`2006年`, pos:2006, desc:`国家对电视购物行业进行了整顿，随后央视正式开播"CCTV中视购物"频道，国家主流电视媒体进军电视购物领域。众多耳熟能详的电视直销品牌就是在那几年巅峰时期被推向大众的，比如好记星、背背佳、金立手机等。`},
+  {label:`2015年之后`, pos:2015, desc:`中国电视购物的好日子一去不复返，各种因素都的都在宣告电视购物时代的结束 —— 消费者老龄化，用户不断减少；2010年左右移动电商+物流+移动支付同时爆发，年轻一代的线上购物场景注定脱离电视；虚假宣传、夸大描述甚至欺骗的做法已经将消费者的信任殆尽……`},
+  {label:`2016年`, pos:2016, desc:`中国网络直播元年，5月份淘宝直播正式上线。同年全国34 家电视购物企业实现销售额 366 亿元，同比下降 8%。`},
+  {label:`2018年`, pos:2018, desc:`李佳琦、薇娅等直播电商头部账号崛起，大众消费正式进入直播间。直播电商交易额达1400亿人民币。`},
+  {label:`2023年`, pos:2023, desc:`直播电商交易额达4.92万亿人民币。`},
+  {label:`2024年`, pos:2024, desc:`直播电商交易额达5.35万亿人民币。`},
+  {label:`2025年`, pos:2025, desc:`直播电商交易额破6万亿人民币。`},
+  {label:`2026年`, pos:2026, desc:`直播电商交易额预计将达到8万亿人民币。`},
+];
+
+const SLOT = 220, PAD_TOP = 30, PAD_BOTTOM = 40;
+const years = [...new Set([...US.map(e=>e.pos), ...CN.map(e=>e.pos)])].sort((a,b)=>a-b);
+const yearIdx = Object.fromEntries(years.map((y,i)=>[y,i]));
+const timeline = document.getElementById('timeline');
+timeline.style.height = (years.length * SLOT + PAD_TOP + PAD_BOTTOM) + 'px';
+
+const spine = document.createElement('div');
+spine.className = 'spine';
+spine.style.top = (PAD_TOP + SLOT/2) + 'px';
+spine.style.height = (years.length * SLOT - SLOT) + 'px';
+timeline.appendChild(spine);
+
+function yOf(pos){ return PAD_TOP + yearIdx[pos] * SLOT + SLOT/2; }
+
+years.forEach(y => {
+  const hasUS = US.some(e=>e.pos===y);
+  const hasCN = CN.some(e=>e.pos===y);
+  if(hasUS){
+    const t = document.createElement('div');
+    t.className='tick'; t.style.width='5px'; t.style.height='5px';
+    t.style.background='var(--us)'; t.style.top=yOf(y)+'px'; t.style.marginLeft='-7px';
+    timeline.appendChild(t);
+  }
+  if(hasCN){
+    const t = document.createElement('div');
+    t.className='tick'; t.style.width='5px'; t.style.height='5px';
+    t.style.background='var(--cn)'; t.style.top=yOf(y)+'px'; t.style.marginLeft='2px';
+    timeline.appendChild(t);
+  }
+});
+
+function makeNode(ev, country){
+  const n = document.createElement('div');
+  n.className = 'node ' + country + (ev.video ? ' has-video' : '');
+  n.style.top = yOf(ev.pos) + 'px';
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const yr = document.createElement('div');
+  yr.className = 'yr' + (ev.label.length > 6 ? ' long' : '');
+  yr.textContent = ev.label;
+
+  const desc = document.createElement('div');
+  desc.className = 'desc';
+  desc.textContent = ev.desc;
+
+  card.appendChild(yr);
+  card.appendChild(desc);
+
+  if(ev.video){
+    const play = document.createElement('div');
+    play.className = 'play';
+    play.textContent = '▶ 播放案例';
+    card.appendChild(play);
+  }
+
+  n.appendChild(card);
+  n.addEventListener('click', () => select(ev, n));
+  return n;
+}
+
+US.forEach(e => timeline.appendChild(makeNode(e, 'us')));
+CN.forEach(e => timeline.appendChild(makeNode(e, 'cn')));
+
+const app = document.querySelector('.app');
+const video = document.getElementById('video');
+const frame = document.getElementById('player-frame');
+const caption = document.getElementById('video-caption');
+
+function select(ev, node){
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+  if(node) node.classList.add('active');
+
+  if(ev.video){
+    app.classList.add('with-video');
+    frame.classList.remove('hidden');
+    video.src = ev.video;
+    caption.innerHTML = '<b>视频</b>　' + ev.cap;
+    video.play().catch(()=>{});
+  }else{
+    app.classList.remove('with-video');
+    frame.classList.add('hidden');
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    caption.innerHTML = '';
+  }
+}
+</script>
+</body>
+</html>
