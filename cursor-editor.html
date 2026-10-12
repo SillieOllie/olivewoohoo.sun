@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>像素光标编辑器</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: -apple-system, "PingFang SC", monospace;
+    background: #1e1e22; color: #e6e6e6;
+    display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;
+  }
+  h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #9aa0a6; }
+  .panel { background: #26262b; border: 1px solid #333; border-radius: 10px; padding: 16px; }
+  .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .toolbar label { font-size: 12px; color: #9aa0a6; }
+  .toolbar input { width: 52px; background: #1e1e22; border: 1px solid #444; color: #eee; border-radius: 6px; padding: 4px 6px; }
+  button { background: #1a5c38; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+  button.ghost { background: #333; }
+  #edit { image-rendering: pixelated; border: 1px solid #444; border-radius: 6px; cursor: crosshair; display: block; }
+  #preview { image-rendering: pixelated; border: 1px solid #444; border-radius: 6px; background: #f5f5f7; display: block; }
+  #out {
+    width: 280px; height: 210px; margin-top: 12px;
+    background: #1e1e22; color: #9ef0c0; border: 1px solid #444; border-radius: 6px;
+    font-family: monospace; font-size: 11px; padding: 8px; resize: vertical;
+  }
+  .hint { font-size: 12px; color: #9aa0a6; margin-top: 10px; line-height: 1.7; max-width: 300px; }
+  .hint b { color: #e6e6e6; }
+</style>
+</head>
+<body>
+
+  <div class="panel">
+    <h3>① 画形状 — 点格子切换 实心 / 空心</h3>
+    <div class="toolbar">
+      <label>宽 <input id="w" type="number" value="32" min="4" max="64"></label>
+      <label>高 <input id="h" type="number" value="32" min="4" max="64"></label>
+      <button id="apply">应用尺寸</button>
+      <button id="clear" class="ghost">清空</button>
+      <button id="fill" class="ghost">全填</button>
+      <button id="loadstd" class="ghost">加载标准箭头</button>
+    </div>
+    <canvas id="edit"></canvas>
+  </div>
+
+  <div class="panel">
+    <h3>② 预览 — 绿描边 + 白内里</h3>
+    <canvas id="preview"></canvas>
+    <textarea id="out" readonly></textarea>
+    <br>
+    <button id="copy">复制 SHAPE 数组</button>
+    <div class="hint">
+      画好后点「复制」，把结果发给我，我贴进 index.html。
+      <br>提示：<b>左键</b>点/拖 = 涂色或擦除；<b>右键按住拖</b> = 框选清空一片。
+    </div>
+  </div>
+
+<script>
+(() => {
+  const GREEN = '#1a5c38', WHITE = '#ffffff';
+  const STD = [
+    "11..............","111.............","1111............","11111...........",
+    "111111..........","1111111.........","1111111111111111","1111111111111111",
+    "1111111111111111","1111111111111111","1111111.11111111","111.111111111111",
+    "11..111111111111","1....11111111111",".....11111111111","......1111111111",
+  ];
+  let W = 32, H = 32;
+  let solid = new Set();
+  let selecting = false, selX0 = 0, selY0 = 0, selX1 = 0, selY1 = 0;
+  const CELL = 20, PCELL = 16;
+  const edit = document.getElementById('edit');
+  const prev = document.getElementById('preview');
+  const out = document.getElementById('out');
+  const ectx = edit.getContext('2d');
+  const pctx = prev.getContext('2d');
+
+  function scaleRows(rows, f) {
+    const out = [];
+    for (let y = 0; y < rows.length * f; y++) {
+      let r = '';
+      for (let x = 0; x < rows[0].length * f; x++) r += rows[Math.floor(y / f)][Math.floor(x / f)];
+      out.push(r);
+    }
+    return out;
+  }
+  function loadRows(rows) {
+    W = rows[0].length; H = rows.length;
+    document.getElementById('w').value = W;
+    document.getElementById('h').value = H;
+    solid = new Set();
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (rows[y][x] === '1') solid.add(x + ',' + y);
+    render();
+  }
+  function render() {
+    edit.width = W * CELL; edit.height = H * CELL;
+    prev.width = W * PCELL; prev.height = H * PCELL;
+    ectx.fillStyle = '#1e1e22'; ectx.fillRect(0, 0, edit.width, edit.height);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const on = solid.has(x + ',' + y);
+      ectx.fillStyle = on ? GREEN : '#2c2c31';
+      ectx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
+    }
+    if (selecting) {
+      const x0 = Math.min(selX0, selX1), x1 = Math.max(selX0, selX1);
+      const y0 = Math.min(selY0, selY1), y1 = Math.max(selY0, selY1);
+      ectx.fillStyle = 'rgba(255, 90, 90, 0.35)';
+      ectx.fillRect(x0 * CELL, y0 * CELL, (x1 - x0 + 1) * CELL, (y1 - y0 + 1) * CELL);
+      ectx.strokeStyle = '#ff6b6b';
+      ectx.lineWidth = 1;
+      ectx.strokeRect(x0 * CELL + 0.5, y0 * CELL + 0.5, (x1 - x0 + 1) * CELL, (y1 - y0 + 1) * CELL);
+    }
+    pctx.fillStyle = '#f5f5f7'; pctx.fillRect(0, 0, prev.width, prev.height);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!solid.has(x + ',' + y)) continue;
+      const edge = !solid.has((x + 1) + ',' + y) || !solid.has((x - 1) + ',' + y)
+               || !solid.has(x + ',' + (y + 1)) || !solid.has(x + ',' + (y - 1));
+      pctx.fillStyle = edge ? GREEN : WHITE;
+      pctx.fillRect(x * PCELL, y * PCELL, PCELL, PCELL);
+    }
+    const rows = [];
+    for (let y = 0; y < H; y++) {
+      let r = '';
+      for (let x = 0; x < W; x++) r += solid.has(x + ',' + y) ? '1' : '.';
+      rows.push('  "' + r + '",');
+    }
+    out.value = 'const SHAPE = [\n' + rows.join('\n') + '\n];';
+  }
+  let painting = false, paintOn = false;
+  const cellAt = (e) => {
+    const r = edit.getBoundingClientRect();
+    return [Math.floor((e.clientX - r.left) / CELL), Math.floor((e.clientY - r.top) / CELL)];
+  };
+  edit.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const [x, y] = cellAt(e);
+    if (x < 0 || y < 0 || x >= W || y >= H) return;
+    if (e.button === 2) { selecting = true; selX0 = selX1 = x; selY0 = selY1 = y; render(); }
+    else { const k = x + ',' + y; paintOn = !solid.has(k); if (paintOn) solid.add(k); else solid.delete(k); painting = true; render(); }
+  });
+  addEventListener('mousemove', (e) => {
+    const [x, y] = cellAt(e);
+    if (painting) {
+      if (x < 0 || y < 0 || x >= W || y >= H) return;
+      const k = x + ',' + y;
+      if (paintOn) solid.add(k); else solid.delete(k);
+      render();
+    } else if (selecting) {
+      selX1 = Math.max(0, Math.min(W - 1, x));
+      selY1 = Math.max(0, Math.min(H - 1, y));
+      render();
+    }
+  });
+  addEventListener('mouseup', (e) => {
+    if (e.button === 2 && selecting) {
+      const x0 = Math.min(selX0, selX1), x1 = Math.max(selX0, selX1);
+      const y0 = Math.min(selY0, selY1), y1 = Math.max(selY0, selY1);
+      for (let yy = y0; yy <= y1; yy++) for (let xx = x0; xx <= x1; xx++) solid.delete(xx + ',' + yy);
+      selecting = false;
+      render();
+    }
+    if (e.button === 0) painting = false;
+  });
+  edit.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.getElementById('apply').onclick = () => {
+    const nw = Math.max(4, Math.min(64, +document.getElementById('w').value || 32));
+    const nh = Math.max(4, Math.min(64, +document.getElementById('h').value || 32));
+    const ns = new Set();
+    for (const k of solid) { const [x, y] = k.split(',').map(Number); if (x < nw && y < nh) ns.add(x + ',' + y); }
+    W = nw; H = nh; solid = ns; render();
+  };
+  document.getElementById('clear').onclick = () => { solid = new Set(); render(); };
+  document.getElementById('fill').onclick = () => { solid = new Set(); for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) solid.add(x + ',' + y); render(); };
+  document.getElementById('loadstd').onclick = () => loadRows(scaleRows(STD, 2));
+  document.getElementById('copy').onclick = () => { out.select(); navigator.clipboard.writeText(out.value); };
+
+  loadRows(scaleRows(STD, 2));
+})();
+</script>
+</body>
+</html>
