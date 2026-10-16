@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私域观察随笔 · 孙婧华 Olive Sun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a5c38;
+    --ink: #111;
+    --muted: #6e746d;
+    --paper: #fff;
+    --rule: #e2e2e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--muted);
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .layout {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 24px 88px;
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+  .side {
+    position: sticky;
+    top: 48px;
+  }
+  .back {
+    display: inline-block;
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+    color: var(--green);
+    text-decoration: none;
+    letter-spacing: .02em;
+    margin-bottom: 32px;
+  }
+  .back:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .toc {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--rule);
+    padding-left: 18px;
+  }
+  .toc a {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 0;
+    letter-spacing: .01em;
+  }
+  .toc a:hover { color: var(--green); }
+  .toc a.lvl1 { font-weight: 700; color: var(--ink); margin-top: 8px; }
+  .toc a.lvl2 { padding-left: 14px; }
+  .container {
+    max-width: 680px;
+    margin: 0;
+    padding: 0;
+  }
+  h2, h3 { scroll-margin-top: 24px; }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .side { position: static; }
+    .toc { display: none; }
+    .back { margin-bottom: 24px; }
+  }
+  .kicker {
+    display: block;
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .18em;
+    color: var(--green);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
+    color: var(--ink);
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 14px 0 10px;
+  }
+  h2 {
+    color: var(--green);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 56px 0 16px;
+  }
+  h2 .num {
+    font-family: "DM Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--green);
+    margin-right: 10px;
+  }
+  p { margin: 0 0 16px; }
+  strong { font-weight: 400; color: var(--ink); }
+  em { font-style: normal; color: var(--green); }
+  .img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 8px; }
+  .img-row img { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  @media (max-width: 560px) { .img-row { grid-template-columns: 1fr; } }
+  .img-one { margin: 20px 0 8px; }
+  .img-one img { max-width: 480px; width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  .ref { margin: -4px 0 16px; }
+  .ref a { font-family: "DM Mono", monospace; font-size: 12.5px; color: var(--green); text-decoration: none; letter-spacing: .02em; word-break: break-all; }
+  .ref a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .foot {
+    margin-top: 72px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: .04em;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="side">
+    <a class="back" href="index.html">← 返回主页</a>
+    <div class="toc">
+      <a href="#sec1" class="lvl1">1 品牌自有</a>
+      <a href="#sec2" class="lvl1">2 第三方私域</a>
+    </div>
+  </nav>
+
+  <main class="container">
+  <header>
+    <span class="kicker">私域 · 观察随笔</span>
+    <h1>私域观察随笔</h1>
+  </header>
+
+  <article>
+
+    <p>我们提及私域的时候，通常有两种基本理解，一种是品牌自有社群，还有一种是第三方的封闭社群。</p>
+
+    <p>我们作为品牌方希望在自有社群建立信任、做价值共创，然后和第三方社群合作去突破细分人群。</p>
+
+    <section>
+      <h2 id="sec1"><span class="num">1</span>品牌自有</h2>
+
+      <p>品牌自有社群核心就是<strong>信任、口碑、价值共创</strong>，主要阵地是 Facebook Group、Discord。</p>
+
+      <p><strong>Facebook Group</strong> 用户或品牌在里面发帖子、发评论，<strong>帖子作为媒体资产可以沉淀下来</strong>，配合广告进行进一步传播；像 Insta360、DJI 用户特别多，会按产品系列分不同的 Facebook Group 群维护。</p>
+
+      <p><strong>Discord</strong> 相当于一个频道制的实时聊天室，核心是<strong>即时答疑和技术共创</strong>。</p>
+
+      <p>Discord 频道中小问题咨询特别多，自发分享解决方案的用户也特别多。社区里分不同频道，<strong>有些频道只有品牌能发言，作为统一的喇叭通知窗</strong>，有一些频道是供用户自由交流的。</p>
+
+      <p>我想分享最近很火的一个 AI 硬件品牌 <strong>Plaud</strong>，这个产品可以磁吸在手机背面，主打语音记录加 AI 摘要、效率管理，除了硬件需要付费以外，AI 总结等等软件功能按月收订阅费。办公群体里他们紧密合作的是医生、律师、销售。</p>
+
+      <p>Plaud 的 Discord 有个很妙的玩法：他们的 #introduction 频道里是强制的发消息模板，必须发姓名、LinkedIn、GitHub 或个人网站、使用场景。机器人识别模板正确才自动解锁全部频道，否则你在其他频道的发言权限是锁住的。</p>
+
+      <div class="img-row">
+        <img src="media/plaud-intro-1.png" alt="Plaud Discord #introduction 强制模板示例 1">
+        <img src="media/plaud-intro-2.png" alt="Plaud Discord #introduction 强制模板示例 2">
+      </div>
+
+      <p>这一步<strong>把「提供信息」设成了社群交流的门槛</strong>——做了用户职业调研、留下职业 profile、还埋了 B 端线索的可能。而且这种强制仪式在社会学上反而增加了某种圈子的认同，例如 B 站发评论需要答题这种类似的设置。Discord 玩法非常灵活，我目前关注到的主要是 AI 硬件、开源硬件、SaaS 这类品牌的社区比较活跃。</p>
+
+      <p>像这种技术类产品的价值共创属性很强，很多用户有<strong>产消一体</strong>的属性——既是买家又是内容产出者，可能会产出插件等等分享在社群里，愿意无偿分享成果，参与动机是<strong>自我实现和社区认同</strong>。</p>
+
+      <p>我最近还关注到一个墨水屏挂件众筹产品，支持开源，单价五十美金左右，预售约一万件，Discord 在众筹阶段聊天就三千多条了，讨论开源、后期刷固件。这类产品甚至可能不开 Facebook Group，重点运营 Discord 或自建论坛。</p>
+    </section>
+
+    <section>
+      <h2 id="sec2"><span class="num">2</span>第三方私域</h2>
+
+      <p>第三方私域一般围绕人群身份建立——妈妈团、学生网络、职工福利平台、行业私会。对于品牌来说，产品定位受众契合某一类人群，就可以去找这类人群聚集的社群。</p>
+
+      <p><strong>妈妈团</strong>就是我们最常说的 Facebook 折扣群组。不管美国还是中国，这类折扣群组常被叫妈妈团，主体是妈妈和家庭采购人群。合作方式就是<strong>折扣加佣金或一口价</strong>，群主在群里分发推荐，借群里的信任关系带动转化。</p>
+
+      <p><strong>学生网络</strong>最有名的就是 Student Beans。学生免费注册、验证学生身份，然后解锁品牌专属折扣码。平台盈利靠几个部分：学生成交下单，平台获得来自品牌方的佣金；付费推广的邮件、Push、广告位；还有一块卖 SaaS 插件，叫 Beans iD。</p>
+
+      <p>很多学生在 Student Beans 上注册了账号，认证了自己某某大学学生的身份，Student Beans 就有这样一个数据库。Shopify 品牌站可以把 Beans iD 嵌入品牌自己站里，然后在结算的触点上提醒学生可以通过这个服务认证学生身份获得额外优惠，达到促单的作用。</p>
+
+      <p><strong>职工福利平台</strong>像 Perkspot、Beneplace，和世界五百强公司签协议给员工产品优惠，品牌入驻收入驻费和佣金。里面最热销的还是 big name 类，比如苹果电脑、戴尔电脑、星巴克等等。Plaud 这种强办公硬件就非常适合，他们和这类平台合作，并且通过这个渠道拿到了 B 端线索，促成了 B 端成交。</p>
+
+      <div class="img-one">
+        <img src="media/plaud-benefits.png" alt="Plaud 职工福利平台合作示例">
+      </div>
+
+      <p><strong>行业私会</strong>可以理解成更细分的职工福利平台。还是以 Plaud 为例，他们的人群是医生、律师、销售。他们和日本、美国的医学协会达成了赞助合作和分销合作。</p>
+
+      <p class="ref"><a href="https://www.ibaho.jp/member-benefits/plaud" target="_blank" rel="noopener">ibaho.jp/member-benefits/plaud ↗</a></p>
+
+      <p>这些协会会员权益是保险大幅优惠、期刊免费读、研讨会免费参加，还有消费品折扣，星巴克、麦当劳、苹果这些 big name 都在名单上。协会盈利一是靠会员费——医生入会要月或年订阅费；但最大资金来源还是广告赞助。</p>
+
+      <p>以上这些第三方私域，都是<strong>强营销属性</strong>的渠道，品牌通过福利优惠渗透人群不会引起很大的反感。</p>
+    </section>
+
+    <p>具体的品牌自有私域如何运营，如何找到适合的私域阵地又是一个课题了。</p>
+
+  </article>
+
+  <footer class="foot">
+    孙婧华 · Olive Sun — 海外联盟营销 · AI 工作流
+  </footer>
+
+  </main>
+
+</div>
+</body>
+</html>
