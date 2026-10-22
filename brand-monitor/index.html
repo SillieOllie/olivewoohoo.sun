@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用 AI 搭一个品牌每日监控系统 · AI 实操分享</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #0b0b0c;
+    --muted: #6b6b6b;
+    --line: #e4e4e4;
+    --red: #e30613;
+    --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- top nav ---- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 2px;
+    background: #fff; border-bottom: 2px solid #000;
+    padding: 0 24px; overflow-x: auto;
+  }
+  nav .brand {
+    color: #000; font-weight: 800; font-size: 12px; white-space: nowrap;
+    margin-right: 20px; letter-spacing: .08em; text-transform: uppercase;
+  }
+  nav .brand span { color: var(--red); }
+  nav a {
+    color: #111; text-decoration: none; font-size: 11px; font-weight: 600;
+    letter-spacing: .09em; text-transform: uppercase;
+    padding: 16px 10px 14px; white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  nav a:hover { color: #000; border-color: #000; }
+  nav a.active { color: var(--red); border-color: var(--red); }
+
+  /* ---- deck ---- */
+  .deck { max-width: 1080px; margin: 0 auto; padding: 60px 24px 100px; }
+  .slide {
+    padding: 0 0 72px; margin-bottom: 72px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .slide:last-of-type { border-bottom: none; }
+  .slide.no {
+    position: absolute; top: -6px; right: 0;
+    font-family: var(--mono); font-size: 34px; font-weight: 700;
+    color: #d9d9d9; letter-spacing: -.03em; line-height: 1;
+  }
+
+  .kicker {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--red); margin-bottom: 14px;
+  }
+  .kicker::before { content: "// "; color: #000; }
+  h2 {
+    font-size: 34px; font-weight: 800; letter-spacing: -.02em; line-height: 1.12;
+    margin-bottom: 18px; padding-bottom: 16px;
+    border-bottom: 3px solid #000;
+  }
+  h3 {
+    font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    margin: 34px 0 12px; color: #000;
+  }
+  h3::before { content: ""; display: inline-block; width: 10px; height: 10px; background: var(--red); margin-right: 9px; }
+  p { color: #1a1a1a; font-size: 15px; margin: 8px 0; }
+  ul { list-style: none; }
+  ul li { position: relative; padding-left: 18px; margin: 8px 0; font-size: 15px; color: #1a1a1a; }
+  ul li::before { content: ""; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; background: #000; }
+
+  code { font-family: var(--mono); font-size: .9em; background: #f2f2f2; padding: 1px 5px; }
+
+  .highlight {
+    margin-top: 34px; padding: 4px 0 4px 18px;
+    border-left: 5px solid var(--red);
+    font-weight: 700; font-size: 15px; color: #000;
+  }
+  .highlight b { color: var(--red); }
+
+  /* ---- columns / grid ---- */
+  .grid { display: grid; gap: 36px; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .card {
+    border-top: 3px solid #000; padding: 14px 0 4px;
+  }
+  .card .t { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .card .t .emoji { margin-right: 5px; }
+  .card p { font-size: 13.5px; color: #3a3a3a; margin: 0; }
+  .card ul li { font-size: 13.5px; }
+
+  /* ---- figure / screenshot ---- */
+  figure { margin: 12px 0 4px; }
+  figure img {
+    width: 100%; display: block; background: #fff;
+    border: 1px solid #000;
+  }
+  figcaption {
+    font-size: 11.5px; color: var(--muted); margin-top: 8px;
+    text-align: left; font-weight: 700; letter-spacing: .02em;
+  }
+  .shots { display: grid; gap: 24px; align-items: start; }
+  .shots.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  /* ---- flow diagram ---- */
+  .flow {
+    display: flex; align-items: center; justify-content: flex-start; gap: 0;
+    flex-wrap: wrap; margin: 10px 0 34px;
+  }
+  .flow .node {
+    background: #fff; color: #000; border: 2px solid #000;
+    padding: 12px 22px; font-weight: 800; font-size: 15px;
+  }
+  .flow .arrow { font-size: 24px; color: var(--red); padding: 0 14px; font-weight: 700; }
+
+  .steps { display: grid; gap: 0; margin-top: 6px; }
+  .step {
+    display: grid; grid-template-columns: 110px 1fr; gap: 18px; align-items: start;
+    padding: 18px 0; border-top: 1px solid var(--line);
+  }
+  .step .tag {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    color: #fff; background: #000; padding: 7px 9px; text-align: center;
+  }
+  .step .tag.alt { background: var(--red); }
+  .step .body { font-size: 14.5px; color: #1a1a1a; }
+  .step .body b { color: #000; }
+
+  /* ---- code / tree ---- */
+  pre {
+    background: #fafafa; color: #111;
+    border: 1px solid #000; border-left: 5px solid #000;
+    padding: 20px 24px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.7;
+    margin-top: 4px;
+  }
+  pre .k { font-weight: 700; color: #000; }
+  pre .o { color: var(--red); }
+  pre .c { color: #555; }
+  pre .dim { color: #9a9a9a; }
+
+  /* ---- video ---- */
+  video { width: 100%; background: #000; border: 1px solid #000; display: block; }
+  .video-label { font-size: 12px; color: #000; font-weight: 800; letter-spacing: .04em; margin: 8px 0 4px; }
+
+  /* ---- speaker notes ---- */
+  details.notes {
+    margin-top: 34px; padding: 12px 0 4px;
+    border-top: 1px solid #000;
+  }
+  details.notes summary {
+    cursor: pointer; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: #000; user-select: none;
+  }
+  details.notes .nbody { font-size: 13.5px; color: #4a4a4a; margin-top: 10px; }
+
+  /* ---- title slide ---- */
+  .slide.title {
+    border-bottom: 1px solid var(--line);
+    padding: 40px 0 72px; min-height: 420px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .slide.title .kicker { color: var(--red); }
+  .slide.title .kicker::before { content: "// "; color: #000; }
+  .slide.title h1 {
+    font-size: 66px; line-height: 1.05; font-weight: 800; letter-spacing: -.025em;
+    margin: 8px 0 22px;
+  }
+  .slide.title .sub { font-size: 21px; color: #3a3a3a; font-weight: 500; }
+  .slide.title .tagline {
+    display: inline-block; margin-top: 40px; align-self: flex-start;
+    font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #000;
+    border-top: 3px solid var(--red); padding-top: 12px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: start; }
+  .two-col.wide-left { grid-template-columns: 1.15fr 1fr; }
+
+  @media (max-width: 860px) {
+    .g3, .shots.cols-3, .two-col, .two-col.wide-left { grid-template-columns: 1fr; }
+    .g2 { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 1fr; }
+    .slide { padding: 0 0 48px; }
+    .slide.title h1 { font-size: 40px; }
+    h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="brand">品牌每日监控<span>· AI 实操</span></div>
+  <a href="#s1">封面</a>
+  <a href="#s2">背景</a>
+  <a href="#s3">监控什么</a>
+  <a href="#s4">整体流程</a>
+  <a href="#s5">数据抓取</a>
+  <a href="#s6">过滤·分析</a>
+  <a href="#s7">推送飞书</a>
+  <a href="#s8">可靠性</a>
+  <a href="#s9">效果</a>
+  <a href="#s10">灵活性</a>
+</nav>
+
+<div class="deck">
+
+  <!-- ============ SLIDE 1 · 封面 ============ -->
+  <section class="slide title" id="s1">
+    <div class="no">01</div>
+    <div class="kicker">AI 实操分享 · 2026</div>
+    <h1>用 AI 搭一个<br>品牌每日监控系统</h1>
+    <div class="sub">从手工搜索到全自动流水线</div>
+    <div class="tagline">亚马逊 AD · 站外推广</div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">我今天分享的是用 AI 搭一个比较简单的品牌自动监控流程，每天自动爬取竞品和自家品牌在各平台上的动态，用大模型处理成结构化的、容易理解的业务语言，最后把每日报告推送到飞书业务群。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 2 · 背景 · 运营痛点 ============ -->
+  <section class="slide" id="s2">
+    <div class="no">02</div>
+    <div class="kicker">背景 · 运营痛点</div>
+    <h2>本品和竞品动态都要快速掌握</h2>
+    <div class="grid g3">
+      <div class="card">
+        <div class="t"><span class="emoji">🏷️</span>为什么监控自家</div>
+        <p>自家合作红人发了视频，运营端不总是即时知道；站外内容一旦爆了，可以同步加广告预算扩大势能。</p>
+      </div>
+      <div class="card">
+        <div class="t"><span class="emoji">🔍</span>为什么监控竞品</div>
+        <p>竞品有什么站外动作？会不会引起亚马逊排名波动？要不要跟进对标？</p>
+      </div>
+      <div class="card">
+        <div class="t"><span class="emoji">🔥</span>日常都要看，大促更紧迫</div>
+        <p>促销期每天需要复盘；竞品信息量大，单靠人工根本搜不完，很容易漏。</p>
+      </div>
+    </div>
+    <p style="margin-top:34px;"><b>以前靠人工逐平台搜索、截图整理表格</b>——半天人力，还容易漏。大促期间信息更多，根本抓不全。</p>
+    <div class="shots cols-3" style="margin-top:24px;">
+      <figure>
+        <img src="assets/image1.png" alt="日常监控手工整理">
+        <figcaption>日常监控手工整理（累）</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/image2.png" alt="大促后复盘竞品动作">
+        <figcaption>大促后复盘竞品动作（信息太多）</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/image3.png" alt="Brand24 工具截图">
+        <figcaption>Brand24（缺少摘要、分析不准确、数据不完整）</figcaption>
+      </figure>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">首先说明下为什么会有这个需求。在销售端，运营、推广都有快速掌握当天品类、品牌动态的需求。一方面要了解自家品牌的动态——自家合作红人发了视频，销售端如果能及时了解，红人内容一旦爆了，推广可以同步加广告预算扩大势能；自家产品如果在社媒论坛上有负面反馈，客服也可以及时跟进处理，控制舆情。另一方面要了解竞品的动态，比如竞品有什么站外动作，会不会引起亚马逊排名波动，要不要对标跟进。及时获取品牌动态、用户反馈，对做电商来说是绝对收益的。但之前没有这样一个固定的、每日品牌品类动态同步的业务流程落地：一是对销售端来说不是直接创造业绩的需求；二是在 AI 化之前，这是一个工作量非常大的任务。我们试过每天手动监测品牌动态，一个个品牌去 Google，一条条帖子去理解提炼信息，速度非常慢。也有 Brand24 这样的工具，但情感判读不准确、没有摘要、数据取回不全。这个流程的目的就是利用 AI，将每日监控品牌动态的人力占用降到几乎为 0，让信息以最清晰易读的业务语言呈现。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 3 · 监控什么 ============ -->
+  <section class="slide" id="s3">
+    <div class="no">03</div>
+    <div class="kicker">监控什么</div>
+    <h2>多个品类、多个品牌、多个平台</h2>
+    <div class="two-col wide-left">
+      <div>
+        <h3>品类 &amp; 品牌</h3>
+        <ul>
+          <li><b>多个品类：</b>行车记录仪、应急电源、充气泵、暴力风扇、脚垫、EV 充电桩、高尔夫测距仪等</li>
+          <li><b>多个品牌：</b>自家品牌 WOLFBOX / REDTIGER + 各品类主要竞品</li>
+          <li><b>10+ 个数据源：</b>YouTube / TikTok / IG / FB / Twitter / Google News / Reddit / 垂直论坛 / 促销站</li>
+        </ul>
+        <h3>以前 vs 现在</h3>
+        <ul>
+          <li><b>以前：</b>每个平台分别手动搜，截图粘表格，半天人力</li>
+          <li><b>现在：</b>Apify 云端爬虫市场，一个入口统一调用，按量付费，无需自建维护</li>
+        </ul>
+      </div>
+      <div>
+        <h3>想知道的</h3>
+        <ul>
+          <li>竞品最近发了什么新品 / 技术首发</li>
+          <li>权威博主做了品类相关内容，带来了什么热度</li>
+          <li>用户关注产品什么、夸什么骂什么</li>
+          <li>竞品有没有有计划地做站外促销</li>
+          <li>欧美加日等市场有无值得关注的动态</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight">目标：<b>每天定时自动跑 → 5 分钟看完飞书，直接有判断</b></div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">当前搭的流程主要监控多个公司主营品类，自家和竞品等二三十个品牌，数据源包括 YouTube、TikTok、Instagram 等社媒平台，Google News 上的媒体报道，Reddit 和其他垂直论坛，顶级促销网站。最值得关注的品牌品类动态，99% 基本都能被这些平台覆盖。业务端透过这些信源就能了解：竞品最近发了什么新品、权威博主做了什么内容、是否给品类带来了热度，用户关注产品什么、夸什么骂什么，竞品有没有做站外促销，欧美加日等市场有没有值得关注的动态。监控这么多渠道，主要利用 Apify 这个按量付费的云端爬虫市场，上面有很多现成专用爬虫，即使没有专用爬虫，也能直接调用 RAG 智能浏览器解析做数据采集。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 4 · 整体流程 ============ -->
+  <section class="slide" id="s4">
+    <div class="no">04</div>
+    <div class="kicker">整体流程</div>
+    <h2>数据抓取 → 数据过滤与分析 → 推送飞书</h2>
+    <div class="flow">
+      <div class="node">数据抓取</div>
+      <div class="arrow">→</div>
+      <div class="node">数据过滤与分析</div>
+      <div class="arrow">→</div>
+      <div class="node">推送飞书</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="tag">STEP 1</div><div class="body"><b>定时触发</b> · 美西时间 0:00 自动启动，抓取前一天数据</div></div>
+      <div class="step"><div class="tag alt">STEP 2</div><div class="body"><b>并行抓数据 + 双重验收</b> · 多个 Agent 同时跑 · ① .done sentinel 文件 ② JSON 内容非空</div></div>
+      <div class="step"><div class="tag">STEP 3</div><div class="body"><b>过滤 · 分析 · 生成卡片</b> · 品类×品牌笛卡尔积拆分 → LLM 预分析 → 7 张卡片 JSON</div></div>
+      <div class="step"><div class="tag alt">STEP 4</div><div class="body"><b>推送飞书</b> · 中转群存档 → merge forward 到品类群</div></div>
+    </div>
+    <h3>brand-monitor-daily / SKILL.md 大纲</h3>
+    <pre><span class="k">brand-monitor-daily</span>
+├─ <span class="k">Trigger</span>
+├─ <span class="k">目标</span>
+├─ <span class="k">信号机制</span><span class="dim">（sentinel + 双重验收）</span>
+├─ <span class="k">进度告警约束</span><span class="dim">（8 条必发消息）</span>
+├─ <span class="k">Step 1</span> 确定目标日期
+├─ <span class="k">Step 2</span> 并行启动多个 fetch subagent
+│   └─ <span class="o">失败处理：自动重启 1 次</span>
+├─ <span class="k">Step 3</span> 验收 fetch 产出
+├─ <span class="k">Step 4</span> 过滤数据（filter）
+├─ <span class="k">Step 4.5</span> 按品牌并行预分析<span class="dim">（~37 Agent）</span>
+├─ <span class="k">Step 4.6</span> 合并分析结果回品类 JSON
+├─ <span class="k">Step 5</span> 并行生成 7 个品类报告
+├─ <span class="k">Step 6</span> 发送 Lark 卡片
+└─ <span class="k">Step 7</span> 汇报 / 告警</pre>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">接下来看下整体流程，其实非常简单，就是数据抓取、数据过滤与分析、最后推送飞书。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 5 · Step 2 数据抓取 ============ -->
+  <section class="slide" id="s5">
+    <div class="no">05</div>
+    <div class="kicker">Step 2 · 数据抓取</div>
+    <h2>一个入口，覆盖所有需求信源</h2>
+    <div class="two-col">
+      <div class="card">
+        <div class="t">☁️ Apify：云端爬虫市场</div>
+        <ul>
+          <li>主流平台（YouTube / TikTok / IG / FB / Twitter / Reddit / Slickdeals 等）都有现成专用爬虫</li>
+          <li>传参数、发 HTTP 请求、拿 JSON——调用方式和普通 API 一样</li>
+          <li>按量付费，无需自建维护，爬虫由 Apify 社区维护</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="t">🤖 RAG 智能浏览器</div>
+        <ul>
+          <li>垂直论坛（dashcamtalk 等）没有专用爬虫</li>
+          <li>RAG browser 自动加载网页、识别正文结构，把有效内容提取出来</li>
+          <li>小众站点也能覆盖，不需要为每个站单独写解析逻辑</li>
+        </ul>
+      </div>
+    </div>
+    <h3>搜索词消歧义</h3>
+    <p>品牌名有歧义时必须加限定词，否则噪音很多：</p>
+    <ul>
+      <li><b>HUSKY</b> → 一半结果是宠物用品，加 <code>liner / mat</code></li>
+      <li><b>NOCO</b> → 一半是北科罗拉多地名，加 <code>boost</code></li>
+      <li><b>3W</b> → 电子元件噪音极大，加 <code>floor mat</code></li>
+    </ul>
+    <h3>覆盖的来源</h3>
+    <ul>
+      <li><b>社交：</b>YouTube / TikTok / IG / FB / Twitter &nbsp;|&nbsp; <b>媒体：</b>Google News</li>
+      <li><b>社区：</b>Reddit + 多个垂直论坛 &nbsp;|&nbsp; <b>促销：</b>Slickdeals + 欧洲多站</li>
+    </ul>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">首先是数据抓取，主要用 Apify 这个平台。主流平台如 Instagram、TikTok 等在 Apify 上都有现成爬虫，设置一个关键词表（包括需要关注的品类、品牌），再设置一个时间窗口，就能采集到需要的信息——帖子内容、评论内容、互动量、帖主粉丝量等一应俱全。因为 Apify 按量付费，花费基本等于内存乘以运行时长，所以要注意额度消耗：一是关键词列表要精准，用最少的关键词覆盖想关注的内容，词不精准抓回来的都是噪音、增加花费；二是每个爬虫可以单独设置内存上限，内存要求低的渠道适当调低上限。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 6 · Step 3 过滤分析生成 ============ -->
+  <section class="slide" id="s6">
+    <div class="no">06</div>
+    <div class="kicker">Step 3 · 过滤 · 分析 · 生成</div>
+    <h2>按品类 × 品牌拆分后，逐卡预分析</h2>
+    <div class="two-col wide-left">
+      <div>
+        <h3>数据文件变化</h3>
+        <pre><span class="dim">youtube.json  tiktok.json ...</span>
+<span class="o">↓ 笛卡尔积拆分</span>
+<span class="dim">dash_cam_Viofo.json  dash_cam_WOLFBOX.json ...</span> <span class="c">(~37 个)</span>
+<span class="o">↓ 预分析 + 合并</span>
+<span class="k">lark_dash_cam.json ...</span> <span class="c">(7 张)</span></pre>
+        <h3>为什么按笛卡尔积拆分</h3>
+        <p style="font-size:14px;">不拆上下文太长；每个 Agent 只看一个品类下一个品牌，判断更准确。</p>
+      </div>
+      <div>
+        <h3>原始抓取数据 → 预分析后结构化字段</h3>
+        <figure>
+          <img src="assets/image4.jpeg" alt="原始抓取数据">
+          <figcaption>原始抓取数据</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/image5.png" alt="预分析后结构化字段">
+          <figcaption>预分析后结构化字段</figcaption>
+        </figure>
+      </div>
+    </div>
+    <h3>表达示例</h3>
+    <div style="max-width:640px;">
+      <figure>
+        <img src="assets/image6.jpeg" alt="表达示例">
+        <figcaption>结构化字段 → 业务语言表达示例</figcaption>
+      </figure>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">数据抓取完，就要过滤、分析、生成报告。数据抓取回来都是一个渠道一个结构化的数据文件，例如 youtube.json，但单个渠道的信息量可能超过一兆，会超出 AI 的上下文限制，非常影响分析质量。所以在分析之前，先按品类乘以品牌的维度对各个渠道的数据进行过滤重组，这样每组数据最大也就几百 KB，分析质量比较好。为了更好地保证分析质量，进行两轮分析：第一轮对单条内容进行分析（品类-品牌维度下，每个品牌当日最多几十条内容）；第二轮针对这几十条摘要内容进行当日总结。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 7 · Step 4 推送飞书 ============ -->
+  <section class="slide" id="s7">
+    <div class="no">07</div>
+    <div class="kicker">Step 4 · 推送飞书</div>
+    <h2>将同品类消息打包，转发到各业务群</h2>
+    <div class="two-col wide-left">
+      <div>
+        <h3>为什么先发中转群</h3>
+        <ul>
+          <li>先把该品类所有品牌卡片发到中转群，拿到所有消息 ID 再统一打包转发——群里收到的是一整组，不会发了一半就断</li>
+          <li>中转群同时作为历史存档，任何时候都能回查或重发</li>
+        </ul>
+        <h3>发送目标</h3>
+        <ul>
+          <li><b>品类专属群：</b>各品类团队只收自己品类的消息</li>
+          <li><b>AD 站外信息同步群：</b>跨品类推广同学统一接收</li>
+        </ul>
+        <div class="highlight" style="margin-top:26px;">群里收到一条折叠消息，展开才是所有品牌卡片——<b>不刷屏</b></div>
+      </div>
+      <div>
+        <h3>推送效果</h3>
+        <figure>
+          <img src="assets/image7.png" alt="飞书折叠消息">
+          <figcaption>飞书收到的折叠消息</figcaption>
+        </figure>
+        <h3>日报演示</h3>
+        <div class="video-label">▶ 日报演示视频</div>
+        <video controls preload="metadata" poster="assets/image8.jpeg">
+          <source src="assets/media1.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">分析完成，最后一步就是把各品类信息推送到有需要的业务群，这个过程先把所有三十几张品牌卡片推送到一个中转群再合并转发到业务群。这样业务群收到的就是一条折叠消息，有需要的同学自己点进去看，减少不必要的视觉占用。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 8 · 可靠性 ============ -->
+  <section class="slide" id="s8">
+    <div class="no">08</div>
+    <div class="kicker">可靠性</div>
+    <h2>每一步都有飞书进度报告</h2>
+    <div class="two-col wide-left">
+      <figure>
+        <img src="assets/image9.png" alt="飞书进度报告">
+        <figcaption>每个 stage 的飞书进度通知</figcaption>
+      </figure>
+      <div>
+        <h3 style="margin-top:0;">每个 stage 完成 / 异常都发消息</h3>
+        <ul>
+          <li>fetch 启动、全部通过、filter 完成……<b>8 条必发消息</b></li>
+          <li>任何平台失败立即发告警，列出失败原因和数据路径</li>
+          <li>主进程挂了也能从飞书看到死在哪一步，不用盯着终端</li>
+        </ul>
+        <h3>自动重试 + 不降级</h3>
+        <ul>
+          <li>任何平台失败 → 自动重启一次，尝试复用 Apify 已有爬取结果</li>
+          <li>重试后仍失败 → 停下来告警，不用残缺数据跑报告</li>
+          <li><b>宁可今天没报告，也不要出一个误导人的报告</b></li>
+        </ul>
+      </div>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">整个品牌监控的流程运行下来，涉及到多个环节，且数据量大，偶尔可能会发生错误，所以每运行完一步，就让 AI 通知一下，有发生错误也会第一时间汇报。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 9 · 效果 ============ -->
+  <section class="slide" id="s9">
+    <div class="no">09</div>
+    <div class="kicker">效果</div>
+    <h2>实际效果演示</h2>
+    <p>整个流程跑完大约需要 <b>1–1.5 小时</b>。人每天花 <b>5–10 分钟</b>看飞书消息，就能比较全面地了解品类品牌在网络上的讨论动向。</p>
+    <div class="two-col" style="margin-top:22px;">
+      <div>
+        <div class="video-label">▶ 日报演示</div>
+        <video controls preload="metadata" poster="assets/image8.jpeg">
+          <source src="assets/media1.mp4" type="video/mp4">
+        </video>
+        <div style="font-size:12px; color:var(--muted); margin-top:6px;">日报演示.mp4</div>
+      </div>
+      <div>
+        <div class="video-label">▶ 周报演示</div>
+        <video controls preload="metadata" poster="assets/image10.jpeg">
+          <source src="assets/media2.mp4" type="video/mp4">
+        </video>
+        <div style="font-size:12px; color:var(--muted); margin-top:6px;">周报演示.mp4</div>
+      </div>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">这是一个实际效果的演示，大概每天花 5 到 10 分钟看飞书消息，就能比较全面地了解品类品牌在网络上的讨论动向。</div>
+    </details>
+  </section>
+
+  <!-- ============ SLIDE 10 · 保留灵活性 ============ -->
+  <section class="slide" id="s10">
+    <div class="no">10</div>
+    <div class="kicker">保留灵活性的地方</div>
+    <h2>保留灵活性，业务侧随时能自己调整</h2>
+    <div class="steps">
+      <div class="step"><div class="tag">📋</div><div class="body"><b>加减品牌 / 改账号：只改一个配置文件</b><br>品牌注册表（registry.json）集中维护所有品牌的社媒账号和搜索词，改完之后所有下游自动同步，不需要懂代码。</div></div>
+      <div class="step"><div class="tag alt">📝</div><div class="body"><b>调试阶段用临时脚本，跑通后逐步固化</b><br>调试期间每次执行 AI 现场生成脚本，方便快速迭代。现在基本跑通了，会逐渐把脚本固定下来，保留配置文件做适当灵活性。</div></div>
+      <div class="step"><div class="tag">🔍</div><div class="body"><b>每天预检</b><br>每天正式跑之前先检查一遍爬虫返回字段是否有变化，发现了及时修；避免跑到空内容。</div></div>
+    </div>
+    <details class="notes">
+      <summary>演讲备注</summary>
+      <div class="nbody">然后这个流程也有一些保留灵活性的地方，例如要增减监控的品牌，只要改一个配置文件，就会自动同步下游模块。还有就是这个流程目前还是用的临时脚本，最近已经跑通了，会把脚本固定下来，增加稳定性，也减少消耗。再是每天正式跑之前先检查一遍爬虫返回字段是否有变化，发现了及时修，避免跑到空内容。</div>
+    </details>
+  </section>
+
+</div>
+
+<script>
+  // 顶部导航高亮 + 键盘左右翻页
+  const navLinks = Array.from(document.querySelectorAll('#nav a'));
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const map = {};
+  navLinks.forEach(a => map[a.getAttribute('href').slice(1)] = a);
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const a = map[e.target.id];
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  slides.forEach(s => observer.observe(s));
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const idx = slides.findIndex(s => {
+      const r = s.getBoundingClientRect();
+      return r.top >= -40;
+    });
+    let target = idx;
+    if (e.key === 'ArrowRight') target = Math.min(slides.length - 1, idx);
+    else target = Math.max(0, idx - 1);
+    slides[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+</script>
+
+</body>
+</html>
